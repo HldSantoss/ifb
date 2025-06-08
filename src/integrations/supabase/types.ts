@@ -42,6 +42,42 @@ export type Database = {
         }
         Relationships: []
       }
+      empreendimentos: {
+        Row: {
+          created_at: string
+          descricao: string | null
+          id: string
+          imagem_url: string | null
+          localizacao: string | null
+          nome: string
+          preco: number | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          imagem_url?: string | null
+          localizacao?: string | null
+          nome: string
+          preco?: number | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          imagem_url?: string | null
+          localizacao?: string | null
+          nome?: string
+          preco?: number | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       invoices: {
         Row: {
           amount: number

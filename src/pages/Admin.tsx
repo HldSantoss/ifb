@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Plus, Edit, Trash2, Building } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -43,7 +42,7 @@ const Admin = () => {
 
   const loadEmpreendimentos = async () => {
     try {
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from('empreendimentos')
         .select('*')
         .order('created_at', { ascending: false });
@@ -69,13 +68,13 @@ const Admin = () => {
         nome: formData.nome,
         descricao: formData.descricao,
         localizacao: formData.localizacao,
-        preco: parseFloat(formData.preco),
+        preco: formData.preco ? parseFloat(formData.preco) : null,
         imagem_url: formData.imagem_url,
         status: formData.status
       };
 
       if (editingId) {
-        const { error } = await (supabase as any)
+        const { error } = await supabase
           .from('empreendimentos')
           .update(empreendimentoData)
           .eq('id', editingId);
@@ -87,7 +86,7 @@ const Admin = () => {
           description: "Empreendimento atualizado com sucesso.",
         });
       } else {
-        const { error } = await (supabase as any)
+        const { error } = await supabase
           .from('empreendimentos')
           .insert([empreendimentoData]);
 
@@ -131,7 +130,7 @@ const Admin = () => {
     if (!confirm('Tem certeza que deseja excluir este empreendimento?')) return;
 
     try {
-      const { error } = await (supabase as any)
+      const { error } = await supabase
         .from('empreendimentos')
         .delete()
         .eq('id', id);
