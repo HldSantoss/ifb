@@ -14,7 +14,7 @@ const Index = () => {
         <div 
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
           style={{
-            backgroundImage: 'url(https://images.unsplash.com/photo-1487958449943-2429e8be8625?auto=format&fit=crop&w=1920&h=1080)'
+            backgroundImage: 'url(/lovable-uploads/0d9c8470-2aff-492d-bd68-2f00e805c90a.png)'
           }}
         ></div>
         
@@ -30,13 +30,13 @@ const Index = () => {
             Mais de 25 anos criando espaços únicos com design moderno e sustentabilidade.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in">
-            <Button asChild size="lg" className="bg-white text-black hover:bg-gray-100">
+            <Button asChild size="lg" className="bg-black text-white hover:bg-gray-800">
               <Link to="/contact">
                 Fale Conosco
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Link>
             </Button>
-            <Button asChild variant="outline" size="lg" className="border-white text-white hover:bg-white hover:text-black">
+            <Button asChild size="lg" className="bg-black text-white hover:bg-gray-800 border-black">
               <Link to="/about">
                 Conheça Nossa História
               </Link>
