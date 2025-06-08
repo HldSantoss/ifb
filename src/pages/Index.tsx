@@ -1,11 +1,58 @@
 
+import { useState, useEffect } from 'react';
 import { ArrowRight, Award, Users, Building } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import PropertyCard from '@/components/PropertyCard';
-import { properties } from '@/data/properties';
+import { supabase } from '@/integrations/supabase/client';
+
+interface Empreendimento {
+  id: string;
+  nome: string;
+  descricao: string;
+  localizacao: string;
+  preco: number;
+  imagem_url: string;
+  status: string;
+}
 
 const Index = () => {
+  const [empreendimentos, setEmpreendimentos] = useState<Empreendimento[]>([]);
+
+  useEffect(() => {
+    loadEmpreendimentos();
+  }, []);
+
+  const loadEmpreendimentos = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('empreendimentos')
+        .select('*')
+        .eq('status', 'disponivel')
+        .order('created_at', { ascending: false })
+        .limit(8);
+
+      if (error) {
+        console.error('Erro ao carregar empreendimentos:', error);
+        return;
+      }
+
+      setEmpreendimentos(data || []);
+    } catch (error) {
+      console.error('Erro ao carregar empreendimentos:', error);
+    }
+  };
+
+  // Convert empreendimentos to the format expected by PropertyCard
+  const properties = empreendimentos.map(emp => ({
+    id: emp.id,
+    title: emp.nome,
+    location: emp.localizacao,
+    price: emp.preco ? `R$ ${emp.preco.toLocaleString('pt-BR')}` : 'Consulte',
+    image: emp.imagem_url || '/lovable-uploads/7477db64-59a1-41c0-9e27-d1fae676b2ec.png',
+    description: emp.descricao || ''
+  }));
+
   return (
     <div className="min-h-screen bg-background">
       {/* Hero Section */}
@@ -63,6 +110,14 @@ const Index = () => {
               <PropertyCard key={property.id} property={property} />
             ))}
           </div>
+          
+          {properties.length === 0 && (
+            <div className="text-center py-12">
+              <p className="text-gray-600 text-lg">
+                Nenhum empreendimento disponível no momento.
+              </p>
+            </div>
+          )}
           
           <div className="text-center mt-12">
             <Button asChild size="lg" className="bg-black hover:bg-gray-800">
