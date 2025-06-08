@@ -11,8 +11,8 @@ const Footer = () => {
           <div className="md:col-span-2">
             <div className="mb-4">
               <img 
-                src="/lovable-uploads/b7830ba2-3f0c-461a-8777-0df84a8d6c77.png" 
-                alt="Logo" 
+                src="/lovable-uploads/33265cf6-499d-4191-a3ba-8586455ad12e.png" 
+                alt="IFB Incorporadora" 
                 className="h-8 w-auto"
               />
             </div>
@@ -64,7 +64,7 @@ const Footer = () => {
 
         <div className="border-t border-gray-800 mt-8 pt-8 text-center">
           <p className="text-gray-400 text-sm">
-            © 2024 IFB Construtora. Todos os direitos reservados.
+            © 2024 IFB Incorporadora. Todos os direitos reservados.
           </p>
         </div>
       </div>

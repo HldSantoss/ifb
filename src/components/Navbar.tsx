@@ -24,8 +24,8 @@ const Navbar = () => {
           {/* Logo */}
           <Link to="/" className="flex items-center">
             <img 
-              src="/lovable-uploads/b7830ba2-3f0c-461a-8777-0df84a8d6c77.png" 
-              alt="Logo" 
+              src="/lovable-uploads/33265cf6-499d-4191-a3ba-8586455ad12e.png" 
+              alt="IFB Incorporadora" 
               className="h-10 w-auto"
             />
           </Link>
