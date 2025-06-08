@@ -40,9 +40,11 @@ const PropertyCard = ({ property }: PropertyCardProps) => {
             {property.location}
           </div>
           
-          <div className="text-lg font-semibold text-green-600">
-            {property.price}
-          </div>
+          {property.price && (
+            <div className="text-lg font-semibold text-green-600">
+              {property.price}
+            </div>
+          )}
         </div>
       </CardContent>
     </Card>

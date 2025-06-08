@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { ArrowRight, Award, Users, Building } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -50,12 +51,12 @@ const Index = () => {
     }
   };
 
-  // Convert empreendimentos to the format expected by PropertyCard
+  // Convert empreendimentos to the format expected by PropertyCard (without price)
   const properties = empreendimentos.map(emp => ({
     id: emp.id,
     title: emp.nome,
     location: emp.localizacao || 'Localização não informada',
-    price: emp.preco ? `R$ ${emp.preco.toLocaleString('pt-BR')}` : 'Consulte',
+    price: '', // Removed price display
     image: emp.imagem_url || '/lovable-uploads/7477db64-59a1-41c0-9e27-d1fae676b2ec.png',
     description: emp.descricao || 'Descrição não disponível'
   }));
