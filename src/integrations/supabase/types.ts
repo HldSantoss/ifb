@@ -45,6 +45,7 @@ export type Database = {
       empreendimentos: {
         Row: {
           created_at: string
+          data_lancamento: string | null
           descricao: string | null
           id: string
           imagem_url: string | null
@@ -56,6 +57,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          data_lancamento?: string | null
           descricao?: string | null
           id?: string
           imagem_url?: string | null
@@ -67,6 +69,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          data_lancamento?: string | null
           descricao?: string | null
           id?: string
           imagem_url?: string | null

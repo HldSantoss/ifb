@@ -11,10 +11,26 @@ interface PropertyCardProps {
     location: string;
     price: string;
     image: string;
+    launchDate?: string | null;
   };
 }
 
 const PropertyCard = ({ property }: PropertyCardProps) => {
+  const formatLaunchDate = (dateString: string | null | undefined) => {
+    if (!dateString) return null;
+    
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleDateString('pt-BR', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+      });
+    } catch (error) {
+      return null;
+    }
+  };
+
   return (
     <Card className="group hover-scale shadow-lg overflow-hidden">
       <div className="relative">
@@ -39,6 +55,13 @@ const PropertyCard = ({ property }: PropertyCardProps) => {
             <MapPin className="w-4 h-4 mr-2" />
             {property.location}
           </div>
+          
+          {property.launchDate && (
+            <div className="flex items-center text-sm text-gray-500">
+              <Calendar className="w-4 h-4 mr-2" />
+              Lançamento: {formatLaunchDate(property.launchDate)}
+            </div>
+          )}
           
           {property.price && (
             <div className="text-lg font-semibold text-green-600">

@@ -15,6 +15,7 @@ interface Empreendimento {
   imagem_url: string | null;
   status: string;
   created_at: string;
+  data_lancamento: string | null;
 }
 
 const Index = () => {
@@ -51,14 +52,15 @@ const Index = () => {
     }
   };
 
-  // Convert empreendimentos to the format expected by PropertyCard (without price)
+  // Convert empreendimentos to the format expected by PropertyCard
   const properties = empreendimentos.map(emp => ({
     id: emp.id,
     title: emp.nome,
     location: emp.localizacao || 'Localização não informada',
     price: '', // Removed price display
     image: emp.imagem_url || '/lovable-uploads/7477db64-59a1-41c0-9e27-d1fae676b2ec.png',
-    description: emp.descricao || 'Descrição não disponível'
+    description: emp.descricao || 'Descrição não disponível',
+    launchDate: emp.data_lancamento
   }));
 
   console.log('🏠 Properties finais:', properties);
@@ -66,9 +68,7 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center justify-center bg-gradient-to-r from-gray-900 via-black to-gray-800 text-white overflow-hidden">
-        <div className="absolute inset-0 bg-black bg-opacity-40"></div>
-        
+      <section className="relative min-h-screen flex items-center justify-center text-white overflow-hidden bg-gradient-to-r from-gray-900 via-black to-gray-800">
         <div className="relative z-10 container mx-auto px-4 text-center">
           <h1 className="text-6xl md:text-7xl font-bold mb-6 animate-fade-in">
             Construindo o
