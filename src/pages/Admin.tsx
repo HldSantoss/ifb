@@ -43,22 +43,13 @@ const Admin = () => {
 
   const loadEmpreendimentos = async () => {
     try {
-      // Using rpc call to bypass type issues temporarily
-      const { data, error } = await supabase.rpc('get_empreendimentos');
+      const { data, error } = await (supabase as any)
+        .from('empreendimentos')
+        .select('*')
+        .order('created_at', { ascending: false });
       
-      if (error) {
-        console.error('Erro RPC:', error);
-        // Fallback to direct query
-        const { data: fallbackData, error: fallbackError } = await (supabase as any)
-          .from('empreendimentos')
-          .select('*')
-          .order('created_at', { ascending: false });
-        
-        if (fallbackError) throw fallbackError;
-        setEmpreendimentos(fallbackData || []);
-      } else {
-        setEmpreendimentos(data || []);
-      }
+      if (error) throw error;
+      setEmpreendimentos(data || []);
     } catch (error) {
       console.error('Erro ao carregar empreendimentos:', error);
       toast({

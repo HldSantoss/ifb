@@ -47,10 +47,10 @@ const Index = () => {
   const properties = empreendimentos.map(emp => ({
     id: emp.id,
     title: emp.nome,
-    location: emp.localizacao,
+    location: emp.localizacao || 'Localização não informada',
     price: emp.preco ? `R$ ${emp.preco.toLocaleString('pt-BR')}` : 'Consulte',
     image: emp.imagem_url || '/lovable-uploads/7477db64-59a1-41c0-9e27-d1fae676b2ec.png',
-    description: emp.descricao || ''
+    description: emp.descricao || 'Descrição não disponível'
   }));
 
   return (
