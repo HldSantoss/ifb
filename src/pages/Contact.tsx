@@ -23,7 +23,9 @@ const Contact = () => {
     setLoading(true);
     
     try {
-      const { error } = await (supabase as any)
+      console.log('📤 Enviando dados para Supabase:', formData);
+      
+      const { data, error } = await supabase
         .from('contatos')
         .insert([
           {
@@ -34,10 +36,15 @@ const Contact = () => {
           }
         ]);
 
+      console.log('📊 Resposta do Supabase:', { data, error });
+
       if (error) {
+        console.error('❌ Erro ao inserir contato:', error);
         throw error;
       }
 
+      console.log('✅ Contato inserido com sucesso');
+      
       toast({
         title: "Mensagem enviada com sucesso!",
         description: "Entraremos em contato em breve.",
@@ -51,7 +58,7 @@ const Contact = () => {
         message: ''
       });
     } catch (error) {
-      console.error('Erro ao enviar mensagem:', error);
+      console.error('💥 Erro ao enviar mensagem:', error);
       toast({
         title: "Erro ao enviar mensagem",
         description: "Tente novamente mais tarde.",

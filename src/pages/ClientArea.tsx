@@ -1,106 +1,106 @@
 
-import { useState, useEffect } from 'react';
-import { User, FileText, CreditCard, Calendar } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
+import { useState } from 'react';
+import { User, Lock, Calendar, CreditCard, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 
-interface Cliente {
+interface Client {
   id: string;
-  nome: string;
+  name: string;
   email: string;
   cpf: string;
-  telefone: string;
-  data_nascimento: string;
+  birth_date: string;
+  phone: string | null;
 }
 
-interface Boleto {
+interface Invoice {
   id: string;
-  numero_boleto: string;
-  valor: number;
-  data_vencimento: string;
-  descricao: string;
+  invoice_number: string;
+  description: string;
+  amount: number;
+  due_date: string;
   status: string;
-  empreendimento: {
-    nome: string;
-  };
 }
 
 const ClientArea = () => {
   const { toast } = useToast();
-  const [cpf, setCpf] = useState('');
-  const [cliente, setCliente] = useState<Cliente | null>(null);
-  const [boletos, setBoletos] = useState<Boleto[]>([]);
   const [loading, setLoading] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [client, setClient] = useState<Client | null>(null);
+  const [invoices, setInvoices] = useState<Invoice[]>([]);
+  const [loginData, setLoginData] = useState({
+    cpf: '',
+    birthDate: ''
+  });
 
-  const buscarCliente = async () => {
-    if (!cpf) {
-      toast({
-        title: "Erro",
-        description: "Por favor, insira o CPF.",
-        variant: "destructive"
-      });
-      return;
-    }
-
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
     setLoading(true);
+    
     try {
-      const { data: clienteData, error: clienteError } = await (supabase as any)
-        .from('clientes')
+      console.log('🔑 Tentando fazer login com:', loginData);
+      
+      // Buscar cliente pelo CPF e data de nascimento
+      const { data: clientData, error: clientError } = await supabase
+        .from('clients')
         .select('*')
-        .eq('cpf', cpf)
+        .eq('cpf', loginData.cpf)
+        .eq('birth_date', loginData.birthDate)
         .single();
 
-      if (clienteError || !clienteData) {
+      if (clientError || !clientData) {
+        console.error('❌ Cliente não encontrado:', clientError);
         toast({
-          title: "Cliente não encontrado",
-          description: "Verifique o CPF informado.",
+          title: "Dados não encontrados",
+          description: "Verifique seu CPF e data de nascimento.",
           variant: "destructive"
         });
-        setCliente(null);
-        setBoletos([]);
         return;
       }
 
-      setCliente(clienteData);
+      console.log('✅ Cliente encontrado:', clientData);
+      setClient(clientData);
       
       // Buscar boletos do cliente
-      const { data: boletosData, error: boletosError } = await (supabase as any)
-        .from('boletos')
-        .select(`
-          *,
-          empreendimento:empreendimento_id (
-            nome
-          )
-        `)
-        .eq('cliente_id', clienteData.id)
-        .order('data_vencimento', { ascending: false });
+      const { data: invoicesData, error: invoicesError } = await supabase
+        .from('invoices')
+        .select('*')
+        .eq('client_id', clientData.id)
+        .order('due_date', { ascending: false });
 
-      if (boletosError) {
-        console.error('Erro ao buscar boletos:', boletosError);
-        setBoletos([]);
+      if (invoicesError) {
+        console.error('⚠️ Erro ao carregar boletos:', invoicesError);
       } else {
-        setBoletos(boletosData || []);
+        console.log('📋 Boletos carregados:', invoicesData);
+        setInvoices(invoicesData || []);
       }
 
+      setIsAuthenticated(true);
       toast({
-        title: "Cliente encontrado!",
-        description: `Bem-vindo, ${clienteData.nome}`,
+        title: "Login realizado com sucesso!",
+        description: `Bem-vindo(a), ${clientData.name}!`
       });
-
+      
     } catch (error) {
-      console.error('Erro ao buscar cliente:', error);
+      console.error('💥 Erro no login:', error);
       toast({
-        title: "Erro",
-        description: "Ocorreu um erro ao buscar os dados.",
+        title: "Erro no login",
+        description: "Tente novamente mais tarde.",
         variant: "destructive"
       });
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    setClient(null);
+    setInvoices([]);
+    setLoginData({ cpf: '', birthDate: '' });
   };
 
   const formatCurrency = (value: number) => {
@@ -116,150 +116,198 @@ const ClientArea = () => {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'pago':
-        return 'bg-green-100 text-green-800';
-      case 'pendente':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'vencido':
-        return 'bg-red-100 text-red-800';
+      case 'paid':
+        return 'text-green-600 bg-green-100';
+      case 'pending':
+        return 'text-yellow-600 bg-yellow-100';
+      case 'overdue':
+        return 'text-red-600 bg-red-100';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'text-gray-600 bg-gray-100';
     }
   };
 
+  const getStatusText = (status: string) => {
+    switch (status) {
+      case 'paid':
+        return 'Pago';
+      case 'pending':
+        return 'Pendente';
+      case 'overdue':
+        return 'Vencido';
+      default:
+        return status;
+    }
+  };
+
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="container mx-auto px-4">
+          <div className="max-w-md mx-auto">
+            <Card className="shadow-lg">
+              <CardHeader className="text-center">
+                <CardTitle className="text-2xl flex items-center justify-center">
+                  <User className="w-6 h-6 mr-2" />
+                  Área do Cliente
+                </CardTitle>
+                <p className="text-gray-600">
+                  Acesse sua área do cliente para visualizar seus boletos
+                </p>
+              </CardHeader>
+              <CardContent>
+                <form onSubmit={handleLogin} className="space-y-6">
+                  <div>
+                    <label htmlFor="cpf" className="block text-sm font-medium mb-2">
+                      CPF *
+                    </label>
+                    <Input
+                      id="cpf"
+                      type="text"
+                      value={loginData.cpf}
+                      onChange={(e) => setLoginData({...loginData, cpf: e.target.value})}
+                      placeholder="000.000.000-00"
+                      required
+                      className="w-full"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label htmlFor="birthDate" className="block text-sm font-medium mb-2">
+                      Data de Nascimento *
+                    </label>
+                    <Input
+                      id="birthDate"
+                      type="date"
+                      value={loginData.birthDate}
+                      onChange={(e) => setLoginData({...loginData, birthDate: e.target.value})}
+                      required
+                      className="w-full"
+                    />
+                  </div>
+                  
+                  <Button 
+                    type="submit" 
+                    className="w-full bg-black hover:bg-gray-800"
+                    disabled={loading}
+                  >
+                    <Lock className="w-4 h-4 mr-2" />
+                    {loading ? 'Acessando...' : 'Acessar'}
+                  </Button>
+                </form>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background">
-      {/* Hero Section */}
-      <section className="bg-gray-900 text-white py-12">
+      {/* Header */}
+      <section className="bg-gradient-to-r from-gray-900 to-black text-white py-12">
         <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto text-center">
-            <h1 className="text-4xl font-bold mb-4 flex items-center justify-center">
-              <User className="w-8 h-8 mr-3" />
-              Área do Cliente
-            </h1>
-            <p className="text-gray-300">
-              Acesse suas informações e acompanhe seus boletos
-            </p>
+          <div className="flex justify-between items-center">
+            <div>
+              <h1 className="text-4xl font-bold mb-2">Área do Cliente</h1>
+              <p className="text-xl opacity-90">Bem-vindo(a), {client?.name}!</p>
+            </div>
+            <Button 
+              onClick={handleLogout}
+              variant="outline" 
+              className="border-white text-white hover:bg-white hover:text-black"
+            >
+              Sair
+            </Button>
           </div>
         </div>
       </section>
 
-      <section className="py-16">
+      {/* Client Info */}
+      <section className="py-8">
         <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto">
-            {/* Search Form */}
-            <Card className="mb-8">
-              <CardHeader>
-                <CardTitle>Buscar Cliente</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex gap-4">
-                  <Input
-                    placeholder="Digite seu CPF (000.000.000-00)"
-                    value={cpf}
-                    onChange={(e) => setCpf(e.target.value)}
-                    className="flex-1"
-                  />
-                  <Button 
-                    onClick={buscarCliente}
-                    disabled={loading}
-                    className="bg-black hover:bg-gray-800"
-                  >
-                    {loading ? 'Buscando...' : 'Buscar'}
-                  </Button>
+          <Card className="mb-8">
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <User className="w-5 h-5 mr-2" />
+                Suas Informações
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid md:grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm text-gray-600">Nome Completo</p>
+                  <p className="font-semibold">{client?.name}</p>
                 </div>
-              </CardContent>
-            </Card>
+                <div>
+                  <p className="text-sm text-gray-600">E-mail</p>
+                  <p className="font-semibold">{client?.email}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600">CPF</p>
+                  <p className="font-semibold">{client?.cpf}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600">Telefone</p>
+                  <p className="font-semibold">{client?.phone || 'Não informado'}</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
 
-            {/* Client Info */}
-            {cliente && (
-              <Card className="mb-8">
-                <CardHeader>
-                  <CardTitle className="flex items-center">
-                    <User className="w-5 h-5 mr-2" />
-                    Informações do Cliente
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <div>
-                      <strong>Nome:</strong> {cliente.nome}
-                    </div>
-                    <div>
-                      <strong>Email:</strong> {cliente.email}
-                    </div>
-                    <div>
-                      <strong>CPF:</strong> {cliente.cpf}
-                    </div>
-                    <div>
-                      <strong>Telefone:</strong> {cliente.telefone || 'Não informado'}
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-
-            {/* Boletos */}
-            {cliente && (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center">
-                    <FileText className="w-5 h-5 mr-2" />
-                    Seus Boletos
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {boletos.length > 0 ? (
-                    <div className="space-y-4">
-                      {boletos.map((boleto) => (
-                        <div
-                          key={boleto.id}
-                          className="border rounded-lg p-4 hover:shadow-md transition-shadow"
-                        >
-                          <div className="flex justify-between items-start mb-2">
-                            <div>
-                              <h3 className="font-semibold text-lg">
-                                {boleto.numero_boleto}
-                              </h3>
-                              <p className="text-gray-600">
-                                {boleto.empreendimento?.nome || 'Empreendimento não especificado'}
-                              </p>
-                            </div>
-                            <Badge className={getStatusColor(boleto.status)}>
-                              {boleto.status}
-                            </Badge>
-                          </div>
-                          
-                          <div className="grid md:grid-cols-3 gap-4 text-sm">
-                            <div className="flex items-center">
-                              <CreditCard className="w-4 h-4 mr-2 text-gray-500" />
-                              <span>
-                                <strong>Valor:</strong> {formatCurrency(boleto.valor)}
-                              </span>
-                            </div>
-                            <div className="flex items-center">
-                              <Calendar className="w-4 h-4 mr-2 text-gray-500" />
-                              <span>
-                                <strong>Vencimento:</strong> {formatDate(boleto.data_vencimento)}
-                              </span>
-                            </div>
-                            <div>
-                              <strong>Descrição:</strong> {boleto.descricao}
-                            </div>
-                          </div>
+          {/* Invoices */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <CreditCard className="w-5 h-5 mr-2" />
+                Seus Boletos
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {invoices.length > 0 ? (
+                <div className="space-y-4">
+                  {invoices.map((invoice) => (
+                    <div key={invoice.id} className="border rounded-lg p-4">
+                      <div className="flex justify-between items-start mb-2">
+                        <div>
+                          <h3 className="font-semibold text-lg">
+                            Boleto #{invoice.invoice_number}
+                          </h3>
+                          <p className="text-gray-600">{invoice.description}</p>
                         </div>
-                      ))}
+                        <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(invoice.status)}`}>
+                          {getStatusText(invoice.status)}
+                        </span>
+                      </div>
+                      
+                      <div className="grid md:grid-cols-3 gap-4 mt-4">
+                        <div>
+                          <p className="text-sm text-gray-600">Valor</p>
+                          <p className="font-semibold text-lg">{formatCurrency(invoice.amount)}</p>
+                        </div>
+                        <div>
+                          <p className="text-sm text-gray-600">Vencimento</p>
+                          <p className="font-semibold">{formatDate(invoice.due_date)}</p>
+                        </div>
+                        <div className="flex items-end">
+                          <Button size="sm" className="bg-black hover:bg-gray-800">
+                            <FileText className="w-4 h-4 mr-1" />
+                            Visualizar
+                          </Button>
+                        </div>
+                      </div>
                     </div>
-                  ) : (
-                    <div className="text-center py-8 text-gray-500">
-                      <FileText className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                      <p>Nenhum boleto encontrado para este cliente.</p>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            )}
-          </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-8">
+                  <CreditCard className="w-12 h-12 mx-auto text-gray-400 mb-4" />
+                  <p className="text-gray-600">Nenhum boleto encontrado.</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
         </div>
       </section>
     </div>
