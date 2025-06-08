@@ -43,13 +43,22 @@ const Admin = () => {
 
   const loadEmpreendimentos = async () => {
     try {
-      const { data, error } = await supabase
-        .from('empreendimentos')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      setEmpreendimentos(data || []);
+      // Using rpc call to bypass type issues temporarily
+      const { data, error } = await supabase.rpc('get_empreendimentos');
+      
+      if (error) {
+        console.error('Erro RPC:', error);
+        // Fallback to direct query
+        const { data: fallbackData, error: fallbackError } = await (supabase as any)
+          .from('empreendimentos')
+          .select('*')
+          .order('created_at', { ascending: false });
+        
+        if (fallbackError) throw fallbackError;
+        setEmpreendimentos(fallbackData || []);
+      } else {
+        setEmpreendimentos(data || []);
+      }
     } catch (error) {
       console.error('Erro ao carregar empreendimentos:', error);
       toast({
@@ -75,7 +84,7 @@ const Admin = () => {
       };
 
       if (editingId) {
-        const { error } = await supabase
+        const { error } = await (supabase as any)
           .from('empreendimentos')
           .update(empreendimentoData)
           .eq('id', editingId);
@@ -87,7 +96,7 @@ const Admin = () => {
           description: "Empreendimento atualizado com sucesso.",
         });
       } else {
-        const { error } = await supabase
+        const { error } = await (supabase as any)
           .from('empreendimentos')
           .insert([empreendimentoData]);
 
@@ -131,7 +140,7 @@ const Admin = () => {
     if (!confirm('Tem certeza que deseja excluir este empreendimento?')) return;
 
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('empreendimentos')
         .delete()
         .eq('id', id);

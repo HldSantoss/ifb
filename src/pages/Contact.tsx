@@ -23,7 +23,7 @@ const Contact = () => {
     setLoading(true);
     
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('contatos')
         .insert([
           {

@@ -25,7 +25,7 @@ const Index = () => {
 
   const loadEmpreendimentos = async () => {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('empreendimentos')
         .select('*')
         .eq('status', 'disponivel')
