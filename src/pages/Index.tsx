@@ -1,4 +1,3 @@
-
 import { ArrowRight, Award, Users, Building } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -14,7 +13,7 @@ const Index = () => {
         <div 
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
           style={{
-            backgroundImage: 'url(/lovable-uploads/0d9c8470-2aff-492d-bd68-2f00e805c90a.png)'
+            backgroundImage: 'url(/lovable-uploads/012a1088-7fea-46ce-9419-8f0d1fd49a5f.png)'
           }}
         ></div>
         
