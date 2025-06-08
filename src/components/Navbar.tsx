@@ -1,7 +1,7 @@
 
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, Building2 } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 const Navbar = () => {
@@ -23,9 +23,13 @@ const Navbar = () => {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2">
-            <Building2 className="w-8 h-8 text-gray-800" />
+            <img 
+              src="/lovable-uploads/4e3ce0c1-d69b-4b1b-a4c5-a63e9e8b8c73.png" 
+              alt="IFB Construtora" 
+              className="h-10 w-auto"
+            />
             <span className="text-xl font-bold text-gray-800">
-              Allure Construct Vista
+              IFB Construtora
             </span>
           </Link>
 

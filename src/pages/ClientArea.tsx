@@ -1,74 +1,147 @@
 
-import { useState } from 'react';
-import { LogIn, User, Building } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { LogIn, User, Building, FileText, Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
-// Mock client data
-const mockClients = [
-  {
-    cpf: '123.456.789-00',
-    birthDate: '1990-05-15',
-    name: 'João Silva Santos',
-    email: 'joao.silva@email.com',
-    phone: '(11) 99999-8888',
-    projects: [
-      {
-        id: 1,
-        name: 'Edifício Vista Mar',
-        unit: 'Apartamento 102',
-        status: 'Em construção',
-        completion: '75%'
-      },
-      {
-        id: 2,
-        name: 'Residencial Green Park',
-        unit: 'Casa 15',
-        status: 'Entregue',
-        completion: '100%'
-      }
-    ]
-  }
-];
+interface Client {
+  id: string;
+  cpf: string;
+  birth_date: string;
+  name: string;
+  email: string;
+  phone: string;
+}
+
+interface Project {
+  id: string;
+  name: string;
+  unit: string;
+  status: string;
+  completion: string;
+}
+
+interface Invoice {
+  id: string;
+  amount: number;
+  due_date: string;
+  description: string;
+  invoice_number: string;
+  status: string;
+  project: {
+    name: string;
+  };
+}
 
 const ClientArea = () => {
   const { toast } = useToast();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [currentClient, setCurrentClient] = useState<any>(null);
+  const [currentClient, setCurrentClient] = useState<Client | null>(null);
+  const [clientProjects, setClientProjects] = useState<Project[]>([]);
+  const [clientInvoices, setClientInvoices] = useState<Invoice[]>([]);
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     cpf: '',
     birthDate: ''
   });
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);
     
-    // Find client by CPF and birth date
-    const client = mockClients.find(
-      c => c.cpf === formData.cpf && c.birthDate === formData.birthDate
-    );
+    try {
+      // Find client by CPF and birth date
+      const { data: client, error } = await supabase
+        .from('clients')
+        .select('*')
+        .eq('cpf', formData.cpf)
+        .eq('birth_date', formData.birthDate)
+        .single();
 
-    if (client) {
+      if (error || !client) {
+        toast({
+          title: "Dados não encontrados",
+          description: "CPF ou data de nascimento incorretos.",
+          variant: "destructive"
+        });
+        return;
+      }
+
       setCurrentClient(client);
+      await loadClientData(client.id);
       setIsLoggedIn(true);
+      
       toast({
         title: "Login realizado com sucesso!",
         description: `Bem-vindo, ${client.name}`,
       });
-    } else {
+    } catch (error) {
+      console.error('Login error:', error);
       toast({
-        title: "Dados não encontrados",
-        description: "CPF ou data de nascimento incorretos.",
+        title: "Erro no login",
+        description: "Ocorreu um erro ao tentar fazer login.",
         variant: "destructive"
       });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loadClientData = async (clientId: string) => {
+    try {
+      // Load client projects
+      const { data: purchases, error: purchasesError } = await supabase
+        .from('purchases')
+        .select(`
+          project:projects (
+            id,
+            name,
+            unit,
+            status,
+            completion
+          )
+        `)
+        .eq('client_id', clientId);
+
+      if (purchasesError) {
+        console.error('Error loading purchases:', purchasesError);
+      } else {
+        const projects = purchases?.map(p => p.project).filter(Boolean) || [];
+        setClientProjects(projects);
+      }
+
+      // Load client invoices
+      const { data: invoices, error: invoicesError } = await supabase
+        .from('invoices')
+        .select(`
+          *,
+          project:projects (
+            name
+          )
+        `)
+        .eq('client_id', clientId)
+        .eq('status', 'pending')
+        .order('due_date', { ascending: true });
+
+      if (invoicesError) {
+        console.error('Error loading invoices:', invoicesError);
+      } else {
+        setClientInvoices(invoices || []);
+      }
+    } catch (error) {
+      console.error('Error loading client data:', error);
     }
   };
 
   const handleLogout = () => {
     setIsLoggedIn(false);
     setCurrentClient(null);
+    setClientProjects([]);
+    setClientInvoices([]);
     setFormData({ cpf: '', birthDate: '' });
   };
 
@@ -77,6 +150,25 @@ const ClientArea = () => {
       ...formData,
       [e.target.name]: e.target.value
     });
+  };
+
+  const handleDownloadInvoice = (invoiceNumber: string) => {
+    // Simulate PDF download
+    toast({
+      title: "Download iniciado",
+      description: `Baixando boleto ${invoiceNumber}...`,
+    });
+  };
+
+  const formatCurrency = (value: number) => {
+    return new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL'
+    }).format(value);
+  };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('pt-BR');
   };
 
   if (!isLoggedIn) {
@@ -137,8 +229,12 @@ const ClientArea = () => {
                       />
                     </div>
                     
-                    <Button type="submit" className="w-full bg-black hover:bg-gray-800">
-                      Acessar
+                    <Button 
+                      type="submit" 
+                      className="w-full bg-black hover:bg-gray-800"
+                      disabled={loading}
+                    >
+                      {loading ? 'Aguarde...' : 'Acessar'}
                     </Button>
                   </form>
                   
@@ -165,7 +261,7 @@ const ClientArea = () => {
         <div className="container mx-auto px-4">
           <div className="flex justify-between items-center">
             <div>
-              <h1 className="text-3xl font-bold">Olá, {currentClient.name}!</h1>
+              <h1 className="text-3xl font-bold">Olá, {currentClient?.name}!</h1>
               <p className="text-gray-300">Bem-vindo à sua área do cliente</p>
             </div>
             <Button onClick={handleLogout} variant="outline" className="text-black">
@@ -191,64 +287,117 @@ const ClientArea = () => {
                   <CardContent className="space-y-4">
                     <div>
                       <label className="text-sm font-medium text-gray-600">Nome</label>
-                      <p className="font-semibold">{currentClient.name}</p>
+                      <p className="font-semibold">{currentClient?.name}</p>
                     </div>
                     <div>
                       <label className="text-sm font-medium text-gray-600">CPF</label>
-                      <p className="font-semibold">{currentClient.cpf}</p>
+                      <p className="font-semibold">{currentClient?.cpf}</p>
                     </div>
                     <div>
                       <label className="text-sm font-medium text-gray-600">E-mail</label>
-                      <p className="font-semibold">{currentClient.email}</p>
+                      <p className="font-semibold">{currentClient?.email}</p>
                     </div>
                     <div>
                       <label className="text-sm font-medium text-gray-600">Telefone</label>
-                      <p className="font-semibold">{currentClient.phone}</p>
+                      <p className="font-semibold">{currentClient?.phone}</p>
                     </div>
                   </CardContent>
                 </Card>
               </div>
 
-              {/* Projects */}
-              <div className="lg:col-span-2">
-                <h2 className="text-2xl font-bold mb-6 flex items-center">
-                  <Building className="w-6 h-6 mr-2" />
-                  Seus Empreendimentos
-                </h2>
-                
-                <div className="space-y-6">
-                  {currentClient.projects.map((project: any) => (
-                    <Card key={project.id} className="shadow-lg">
-                      <CardHeader>
-                        <CardTitle className="text-xl">{project.name}</CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="grid md:grid-cols-3 gap-4">
-                          <div>
-                            <label className="text-sm font-medium text-gray-600">Unidade</label>
-                            <p className="font-semibold">{project.unit}</p>
-                          </div>
-                          <div>
-                            <label className="text-sm font-medium text-gray-600">Status</label>
-                            <p className="font-semibold">{project.status}</p>
-                          </div>
-                          <div>
-                            <label className="text-sm font-medium text-gray-600">Progresso</label>
-                            <div className="flex items-center">
-                              <div className="flex-1 bg-gray-200 rounded-full h-2 mr-2">
-                                <div 
-                                  className="bg-green-500 h-2 rounded-full" 
-                                  style={{ width: project.completion }}
-                                ></div>
+              {/* Projects and Invoices */}
+              <div className="lg:col-span-2 space-y-8">
+                {/* Projects */}
+                <div>
+                  <h2 className="text-2xl font-bold mb-6 flex items-center">
+                    <Building className="w-6 h-6 mr-2" />
+                    Seus Empreendimentos
+                  </h2>
+                  
+                  <div className="space-y-6">
+                    {clientProjects.map((project) => (
+                      <Card key={project.id} className="shadow-lg">
+                        <CardHeader>
+                          <CardTitle className="text-xl">{project.name}</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="grid md:grid-cols-3 gap-4">
+                            <div>
+                              <label className="text-sm font-medium text-gray-600">Unidade</label>
+                              <p className="font-semibold">{project.unit}</p>
+                            </div>
+                            <div>
+                              <label className="text-sm font-medium text-gray-600">Status</label>
+                              <p className="font-semibold">{project.status}</p>
+                            </div>
+                            <div>
+                              <label className="text-sm font-medium text-gray-600">Progresso</label>
+                              <div className="flex items-center">
+                                <div className="flex-1 bg-gray-200 rounded-full h-2 mr-2">
+                                  <div 
+                                    className="bg-green-500 h-2 rounded-full" 
+                                    style={{ width: project.completion }}
+                                  ></div>
+                                </div>
+                                <span className="text-sm font-semibold">{project.completion}</span>
                               </div>
-                              <span className="text-sm font-semibold">{project.completion}</span>
                             </div>
                           </div>
-                        </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Invoices */}
+                {clientInvoices.length > 0 && (
+                  <div>
+                    <h2 className="text-2xl font-bold mb-6 flex items-center">
+                      <FileText className="w-6 h-6 mr-2" />
+                      Boletos em Aberto
+                    </h2>
+                    
+                    <Card className="shadow-lg">
+                      <CardContent className="p-0">
+                        <Table>
+                          <TableHeader>
+                            <TableRow>
+                              <TableHead>Número</TableHead>
+                              <TableHead>Empreendimento</TableHead>
+                              <TableHead>Descrição</TableHead>
+                              <TableHead>Vencimento</TableHead>
+                              <TableHead>Valor</TableHead>
+                              <TableHead>Ações</TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {clientInvoices.map((invoice) => (
+                              <TableRow key={invoice.id}>
+                                <TableCell className="font-medium">
+                                  {invoice.invoice_number}
+                                </TableCell>
+                                <TableCell>{invoice.project.name}</TableCell>
+                                <TableCell>{invoice.description}</TableCell>
+                                <TableCell>{formatDate(invoice.due_date)}</TableCell>
+                                <TableCell>{formatCurrency(invoice.amount)}</TableCell>
+                                <TableCell>
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={() => handleDownloadInvoice(invoice.invoice_number)}
+                                  >
+                                    <Download className="w-4 h-4 mr-1" />
+                                    Download
+                                  </Button>
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
                       </CardContent>
                     </Card>
-                  ))}
-                </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>

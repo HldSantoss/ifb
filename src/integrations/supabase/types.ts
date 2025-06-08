@@ -9,7 +9,156 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      clients: {
+        Row: {
+          birth_date: string
+          cpf: string
+          created_at: string
+          email: string
+          id: string
+          name: string
+          phone: string
+          updated_at: string
+        }
+        Insert: {
+          birth_date: string
+          cpf: string
+          created_at?: string
+          email: string
+          id?: string
+          name: string
+          phone: string
+          updated_at?: string
+        }
+        Update: {
+          birth_date?: string
+          cpf?: string
+          created_at?: string
+          email?: string
+          id?: string
+          name?: string
+          phone?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      invoices: {
+        Row: {
+          amount: number
+          client_id: string
+          created_at: string
+          description: string
+          due_date: string
+          id: string
+          invoice_number: string
+          project_id: string
+          status: string
+        }
+        Insert: {
+          amount: number
+          client_id: string
+          created_at?: string
+          description: string
+          due_date: string
+          id?: string
+          invoice_number: string
+          project_id: string
+          status?: string
+        }
+        Update: {
+          amount?: number
+          client_id?: string
+          created_at?: string
+          description?: string
+          due_date?: string
+          id?: string
+          invoice_number?: string
+          project_id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invoices_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invoices_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      projects: {
+        Row: {
+          completion: string
+          created_at: string
+          id: string
+          name: string
+          status: string
+          unit: string
+        }
+        Insert: {
+          completion: string
+          created_at?: string
+          id?: string
+          name: string
+          status: string
+          unit: string
+        }
+        Update: {
+          completion?: string
+          created_at?: string
+          id?: string
+          name?: string
+          status?: string
+          unit?: string
+        }
+        Relationships: []
+      }
+      purchases: {
+        Row: {
+          client_id: string
+          created_at: string
+          id: string
+          project_id: string
+          purchase_date: string
+        }
+        Insert: {
+          client_id: string
+          created_at?: string
+          id?: string
+          project_id: string
+          purchase_date: string
+        }
+        Update: {
+          client_id?: string
+          created_at?: string
+          id?: string
+          project_id?: string
+          purchase_date?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "purchases_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "purchases_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
