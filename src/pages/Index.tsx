@@ -25,6 +25,7 @@ const Index = () => {
 
   const loadEmpreendimentos = async () => {
     try {
+      console.log('Carregando empreendimentos...');
       const { data, error } = await supabase
         .from('empreendimentos')
         .select('*')
@@ -37,6 +38,9 @@ const Index = () => {
         return;
       }
 
+      console.log('Dados recebidos do Supabase:', data);
+      console.log('Número de empreendimentos encontrados:', data?.length || 0);
+      
       setEmpreendimentos(data || []);
     } catch (error) {
       console.error('Erro ao carregar empreendimentos:', error);
@@ -44,14 +48,19 @@ const Index = () => {
   };
 
   // Convert empreendimentos to the format expected by PropertyCard
-  const properties = empreendimentos.map(emp => ({
-    id: emp.id,
-    title: emp.nome,
-    location: emp.localizacao || 'Localização não informada',
-    price: emp.preco ? `R$ ${emp.preco.toLocaleString('pt-BR')}` : 'Consulte',
-    image: emp.imagem_url || '/lovable-uploads/7477db64-59a1-41c0-9e27-d1fae676b2ec.png',
-    description: emp.descricao || 'Descrição não disponível'
-  }));
+  const properties = empreendimentos.map(emp => {
+    console.log('Mapeando empreendimento:', emp);
+    return {
+      id: emp.id,
+      title: emp.nome,
+      location: emp.localizacao || 'Localização não informada',
+      price: emp.preco ? `R$ ${emp.preco.toLocaleString('pt-BR')}` : 'Consulte',
+      image: emp.imagem_url || '/lovable-uploads/7477db64-59a1-41c0-9e27-d1fae676b2ec.png',
+      description: emp.descricao || 'Descrição não disponível'
+    };
+  });
+
+  console.log('Properties mapeadas:', properties);
 
   return (
     <div className="min-h-screen bg-background">
@@ -103,6 +112,9 @@ const Index = () => {
               Descubra projetos exclusivos que combinam arquitetura inovadora, 
               localização privilegiada e qualidade superior em cada detalhe.
             </p>
+            <p className="text-sm text-gray-500 mt-2">
+              {properties.length} empreendimento(s) encontrado(s)
+            </p>
           </div>
           
           <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
@@ -116,6 +128,12 @@ const Index = () => {
               <p className="text-gray-600 text-lg">
                 Nenhum empreendimento disponível no momento.
               </p>
+              <Button 
+                onClick={loadEmpreendimentos}
+                className="mt-4 bg-blue-600 hover:bg-blue-700"
+              >
+                Recarregar
+              </Button>
             </div>
           )}
           

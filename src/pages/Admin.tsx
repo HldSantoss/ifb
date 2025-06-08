@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Plus, Edit, Trash2, Building } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -42,15 +43,21 @@ const Admin = () => {
 
   const loadEmpreendimentos = async () => {
     try {
+      console.log('Admin: Carregando empreendimentos...');
       const { data, error } = await supabase
         .from('empreendimentos')
         .select('*')
         .order('created_at', { ascending: false });
       
-      if (error) throw error;
+      if (error) {
+        console.error('Admin: Erro ao carregar empreendimentos:', error);
+        throw error;
+      }
+      
+      console.log('Admin: Empreendimentos carregados:', data);
       setEmpreendimentos(data || []);
     } catch (error) {
-      console.error('Erro ao carregar empreendimentos:', error);
+      console.error('Admin: Erro ao carregar empreendimentos:', error);
       toast({
         title: "Erro",
         description: "Não foi possível carregar os empreendimentos.",
@@ -73,25 +80,36 @@ const Admin = () => {
         status: formData.status
       };
 
+      console.log('Admin: Dados a serem salvos:', empreendimentoData);
+
       if (editingId) {
         const { error } = await supabase
           .from('empreendimentos')
           .update(empreendimentoData)
           .eq('id', editingId);
 
-        if (error) throw error;
+        if (error) {
+          console.error('Admin: Erro ao atualizar:', error);
+          throw error;
+        }
 
+        console.log('Admin: Empreendimento atualizado com sucesso');
         toast({
           title: "Sucesso!",
           description: "Empreendimento atualizado com sucesso.",
         });
       } else {
-        const { error } = await supabase
+        const { data, error } = await supabase
           .from('empreendimentos')
-          .insert([empreendimentoData]);
+          .insert([empreendimentoData])
+          .select();
 
-        if (error) throw error;
+        if (error) {
+          console.error('Admin: Erro ao inserir:', error);
+          throw error;
+        }
 
+        console.log('Admin: Empreendimento criado com sucesso:', data);
         toast({
           title: "Sucesso!",
           description: "Empreendimento cadastrado com sucesso.",
@@ -102,7 +120,7 @@ const Admin = () => {
       loadEmpreendimentos();
       setDialogOpen(false);
     } catch (error) {
-      console.error('Erro ao salvar empreendimento:', error);
+      console.error('Admin: Erro ao salvar empreendimento:', error);
       toast({
         title: "Erro",
         description: "Não foi possível salvar o empreendimento.",
@@ -144,7 +162,7 @@ const Admin = () => {
 
       loadEmpreendimentos();
     } catch (error) {
-      console.error('Erro ao excluir empreendimento:', error);
+      console.error('Admin: Erro ao excluir empreendimento:', error);
       toast({
         title: "Erro",
         description: "Não foi possível excluir o empreendimento.",
@@ -318,7 +336,17 @@ const Admin = () => {
         <div className="container mx-auto px-4">
           <Card>
             <CardHeader>
-              <CardTitle>Empreendimentos Cadastrados</CardTitle>
+              <CardTitle>
+                Empreendimentos Cadastrados ({empreendimentos.length})
+                <Button 
+                  onClick={loadEmpreendimentos}
+                  size="sm"
+                  variant="outline"
+                  className="ml-4"
+                >
+                  Recarregar
+                </Button>
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <Table>
