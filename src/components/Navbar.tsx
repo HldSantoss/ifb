@@ -13,7 +13,6 @@ const Navbar = () => {
     { name: 'Sobre Nós', path: '/about' },
     { name: 'Fale Conosco', path: '/contact' },
     { name: 'Área do Cliente', path: '/client-area' },
-    { name: 'Admin', path: '/admin' },
   ];
 
   const isActive = (path: string) => location.pathname === path;
@@ -23,15 +22,12 @@ const Navbar = () => {
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          <Link to="/" className="flex items-center space-x-2">
+          <Link to="/" className="flex items-center">
             <img 
               src="/lovable-uploads/b7830ba2-3f0c-461a-8777-0df84a8d6c77.png" 
-              alt="IFB Construtora" 
+              alt="Logo" 
               className="h-10 w-auto"
             />
-            <span className="text-xl font-bold text-gray-800">
-              IFB Construtora
-            </span>
           </Link>
 
           {/* Desktop Navigation */}

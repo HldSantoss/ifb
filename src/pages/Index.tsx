@@ -68,12 +68,6 @@ const Index = () => {
       {/* Hero Section */}
       <section className="relative min-h-screen flex items-center justify-center bg-gradient-to-r from-gray-900 via-black to-gray-800 text-white overflow-hidden">
         <div className="absolute inset-0 bg-black bg-opacity-40"></div>
-        <div 
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{
-            backgroundImage: 'url(/lovable-uploads/7477db64-59a1-41c0-9e27-d1fae676b2ec.png)'
-          }}
-        ></div>
         
         <div className="relative z-10 container mx-auto px-4 text-center">
           <h1 className="text-6xl md:text-7xl font-bold mb-6 animate-fade-in">
@@ -113,19 +107,6 @@ const Index = () => {
               Descubra projetos exclusivos que combinam arquitetura inovadora, 
               localização privilegiada e qualidade superior em cada detalhe.
             </p>
-            <div className="flex items-center justify-center gap-4 mt-4">
-              <p className="text-sm text-gray-500">
-                {loading ? 'Carregando...' : `${properties.length} empreendimento(s) encontrado(s)`}
-              </p>
-              <Button 
-                onClick={loadEmpreendimentos}
-                size="sm"
-                variant="outline"
-                disabled={loading}
-              >
-                {loading ? 'Carregando...' : 'Recarregar'}
-              </Button>
-            </div>
           </div>
           
           {loading ? (
@@ -143,12 +124,6 @@ const Index = () => {
               <p className="text-gray-600 text-lg mb-4">
                 Nenhum empreendimento encontrado.
               </p>
-              <Button 
-                onClick={loadEmpreendimentos}
-                className="bg-blue-600 hover:bg-blue-700"
-              >
-                Tentar Novamente
-              </Button>
             </div>
           )}
           
@@ -166,7 +141,7 @@ const Index = () => {
       {/* Stats Section */}
       <section className="py-20 bg-gray-50">
         <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-3 gap-8 text-center">
+          <div className="grid md:grid-cols-4 gap-8 text-center">
             <div className="p-8">
               <Award className="w-12 h-12 mx-auto mb-4 text-gray-800" />
               <div className="text-4xl font-bold text-gray-800 mb-2">25+</div>
@@ -181,6 +156,11 @@ const Index = () => {
               <Users className="w-12 h-12 mx-auto mb-4 text-gray-800" />
               <div className="text-4xl font-bold text-gray-800 mb-2">5000+</div>
               <div className="text-lg text-gray-600">Famílias Atendidas</div>
+            </div>
+            <div className="p-8">
+              <Building className="w-12 h-12 mx-auto mb-4 text-gray-800" />
+              <div className="text-4xl font-bold text-gray-800 mb-2">+20</div>
+              <div className="text-lg text-gray-600">Projetos em Andamento</div>
             </div>
           </div>
         </div>

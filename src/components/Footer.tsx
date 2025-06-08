@@ -9,13 +9,12 @@ const Footer = () => {
         <div className="grid md:grid-cols-4 gap-8">
           {/* Logo and Description */}
           <div className="md:col-span-2">
-            <div className="flex items-center space-x-2 mb-4">
+            <div className="mb-4">
               <img 
                 src="/lovable-uploads/b7830ba2-3f0c-461a-8777-0df84a8d6c77.png" 
-                alt="IFB Construtora" 
+                alt="Logo" 
                 className="h-8 w-auto"
               />
-              <span className="text-xl font-bold">IFB Construtora</span>
             </div>
             <p className="text-gray-300 mb-4 max-w-md">
               Construindo sonhos há 25 anos. Especializados em empreendimentos 
