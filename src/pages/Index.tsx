@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { ArrowRight, Award, Users, Building } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -9,15 +8,17 @@ import { supabase } from '@/integrations/supabase/client';
 interface Empreendimento {
   id: string;
   nome: string;
-  descricao: string;
-  localizacao: string;
-  preco: number;
-  imagem_url: string;
+  descricao: string | null;
+  localizacao: string | null;
+  preco: number | null;
+  imagem_url: string | null;
   status: string;
+  created_at: string;
 }
 
 const Index = () => {
   const [empreendimentos, setEmpreendimentos] = useState<Empreendimento[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     loadEmpreendimentos();
@@ -25,42 +26,41 @@ const Index = () => {
 
   const loadEmpreendimentos = async () => {
     try {
-      console.log('Carregando empreendimentos...');
+      setLoading(true);
+      console.log('🔄 Carregando empreendimentos...');
+      
       const { data, error } = await supabase
         .from('empreendimentos')
         .select('*')
-        .eq('status', 'disponivel')
-        .order('created_at', { ascending: false })
-        .limit(8);
+        .order('created_at', { ascending: false });
+
+      console.log('📊 Resposta do Supabase:', { data, error });
 
       if (error) {
-        console.error('Erro ao carregar empreendimentos:', error);
+        console.error('❌ Erro ao carregar empreendimentos:', error);
         return;
       }
 
-      console.log('Dados recebidos do Supabase:', data);
-      console.log('Número de empreendimentos encontrados:', data?.length || 0);
-      
+      console.log('✅ Empreendimentos carregados:', data?.length || 0);
       setEmpreendimentos(data || []);
     } catch (error) {
-      console.error('Erro ao carregar empreendimentos:', error);
+      console.error('💥 Erro inesperado:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
   // Convert empreendimentos to the format expected by PropertyCard
-  const properties = empreendimentos.map(emp => {
-    console.log('Mapeando empreendimento:', emp);
-    return {
-      id: emp.id,
-      title: emp.nome,
-      location: emp.localizacao || 'Localização não informada',
-      price: emp.preco ? `R$ ${emp.preco.toLocaleString('pt-BR')}` : 'Consulte',
-      image: emp.imagem_url || '/lovable-uploads/7477db64-59a1-41c0-9e27-d1fae676b2ec.png',
-      description: emp.descricao || 'Descrição não disponível'
-    };
-  });
+  const properties = empreendimentos.map(emp => ({
+    id: emp.id,
+    title: emp.nome,
+    location: emp.localizacao || 'Localização não informada',
+    price: emp.preco ? `R$ ${emp.preco.toLocaleString('pt-BR')}` : 'Consulte',
+    image: emp.imagem_url || '/lovable-uploads/7477db64-59a1-41c0-9e27-d1fae676b2ec.png',
+    description: emp.descricao || 'Descrição não disponível'
+  }));
 
-  console.log('Properties mapeadas:', properties);
+  console.log('🏠 Properties finais:', properties);
 
   return (
     <div className="min-h-screen bg-background">
@@ -112,27 +112,41 @@ const Index = () => {
               Descubra projetos exclusivos que combinam arquitetura inovadora, 
               localização privilegiada e qualidade superior em cada detalhe.
             </p>
-            <p className="text-sm text-gray-500 mt-2">
-              {properties.length} empreendimento(s) encontrado(s)
-            </p>
-          </div>
-          
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-            {properties.map((property) => (
-              <PropertyCard key={property.id} property={property} />
-            ))}
-          </div>
-          
-          {properties.length === 0 && (
-            <div className="text-center py-12">
-              <p className="text-gray-600 text-lg">
-                Nenhum empreendimento disponível no momento.
+            <div className="flex items-center justify-center gap-4 mt-4">
+              <p className="text-sm text-gray-500">
+                {loading ? 'Carregando...' : `${properties.length} empreendimento(s) encontrado(s)`}
               </p>
               <Button 
                 onClick={loadEmpreendimentos}
-                className="mt-4 bg-blue-600 hover:bg-blue-700"
+                size="sm"
+                variant="outline"
+                disabled={loading}
               >
-                Recarregar
+                {loading ? 'Carregando...' : 'Recarregar'}
+              </Button>
+            </div>
+          </div>
+          
+          {loading ? (
+            <div className="text-center py-12">
+              <p className="text-gray-600 text-lg">Carregando empreendimentos...</p>
+            </div>
+          ) : properties.length > 0 ? (
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+              {properties.map((property) => (
+                <PropertyCard key={property.id} property={property} />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12">
+              <p className="text-gray-600 text-lg mb-4">
+                Nenhum empreendimento encontrado.
+              </p>
+              <Button 
+                onClick={loadEmpreendimentos}
+                className="bg-blue-600 hover:bg-blue-700"
+              >
+                Tentar Novamente
               </Button>
             </div>
           )}
