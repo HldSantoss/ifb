@@ -56,47 +56,79 @@ const ClientArea = () => {
       console.log('🔑 Tentando fazer login com CPF:', loginData.cpf);
       console.log('🔑 Data de nascimento:', loginData.birthDate);
       
-      // Primeiro, vamos listar todos os clientes para debug
+      // Primeiro, vamos verificar a conexão e listar todos os clientes
+      console.log('🔌 Testando conexão com Supabase...');
+      const { data: testConnection, error: connectionError } = await supabase
+        .from('clients')
+        .select('count', { count: 'exact', head: true });
+      
+      if (connectionError) {
+        console.error('❌ Erro de conexão:', connectionError);
+        toast({
+          title: "Erro de conexão",
+          description: "Não foi possível conectar ao banco de dados.",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      console.log('✅ Conexão estabelecida. Total de clientes:', testConnection);
+
+      // Listar todos os clientes para debug
       const { data: allClients, error: listError } = await supabase
         .from('clients')
-        .select('cpf, birth_date, name');
+        .select('*');
       
       if (listError) {
         console.error('❌ Erro ao listar clientes:', listError);
       } else {
         console.log('📋 Todos os clientes na base:', allClients);
+        console.log('📊 Quantidade de clientes encontrados:', allClients?.length || 0);
       }
       
       // Remove formatação do CPF para busca
       const cleanCPF = loginData.cpf.replace(/\D/g, '');
-      const formattedCPF = cleanCPF.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+      console.log('🔍 CPF limpo para busca:', cleanCPF);
+      console.log('🔍 CPF formatado:', loginData.cpf);
+      console.log('🔍 Data de nascimento:', loginData.birthDate);
       
-      console.log('🔍 Buscando com CPF limpo:', cleanCPF);
-      console.log('🔍 Buscando com CPF formatado:', formattedCPF);
-      console.log('🔍 Data formatada para busca:', loginData.birthDate);
-      
-      // Tentar buscar com diferentes formatações de CPF
+      // Buscar cliente por CPF (testando múltiplos formatos)
       const { data: clientData, error: clientError } = await supabase
         .from('clients')
         .select('*')
-        .or(`cpf.eq.${loginData.cpf},cpf.eq.${formattedCPF},cpf.eq.${cleanCPF}`)
+        .or(`cpf.eq.${loginData.cpf},cpf.eq.${cleanCPF}`)
         .eq('birth_date', loginData.birthDate);
 
-      console.log('📊 Resultado da busca:', clientData);
-      console.log('📊 Erro da busca:', clientError);
+      console.log('📊 Query executada - Resultado:', clientData);
+      console.log('📊 Query executada - Erro:', clientError);
 
       if (clientError) {
         console.error('❌ Erro na consulta:', clientError);
         toast({
           title: "Erro no sistema",
-          description: "Tente novamente mais tarde.",
+          description: "Erro na consulta ao banco de dados. Tente novamente.",
           variant: "destructive"
         });
         return;
       }
 
       if (!clientData || clientData.length === 0) {
-        console.log('❌ Nenhum cliente encontrado com os dados fornecidos');
+        console.log('❌ Nenhum cliente encontrado');
+        
+        // Fazer busca individual para debug
+        const { data: cpfSearch } = await supabase
+          .from('clients')
+          .select('*')
+          .or(`cpf.eq.${loginData.cpf},cpf.eq.${cleanCPF}`);
+        
+        const { data: dateSearch } = await supabase
+          .from('clients')
+          .select('*')
+          .eq('birth_date', loginData.birthDate);
+        
+        console.log('🔍 Busca apenas por CPF:', cpfSearch);
+        console.log('🔍 Busca apenas por data:', dateSearch);
+        
         toast({
           title: "Dados não encontrados",
           description: "Verifique seu CPF e data de nascimento. Certifique-se de que estão corretos.",
@@ -133,7 +165,7 @@ const ClientArea = () => {
       console.error('💥 Erro no login:', error);
       toast({
         title: "Erro no login",
-        description: "Tente novamente mais tarde.",
+        description: "Erro inesperado. Tente novamente mais tarde.",
         variant: "destructive"
       });
     } finally {
@@ -246,6 +278,14 @@ const ClientArea = () => {
                     <Lock className="w-4 h-4 mr-2" />
                     {loading ? 'Acessando...' : 'Acessar'}
                   </Button>
+                  
+                  <div className="text-xs text-gray-500 mt-4 p-3 bg-gray-50 rounded">
+                    <strong>Dados de teste:</strong><br/>
+                    CPF: 123.456.789-00<br/>
+                    Data: 1995-12-19<br/><br/>
+                    CPF: 987.654.321-00<br/>
+                    Data: 1990-05-15
+                  </div>
                 </form>
               </CardContent>
             </Card>
