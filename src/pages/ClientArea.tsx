@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { User, Lock, Calendar, CreditCard, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -27,20 +27,96 @@ interface Invoice {
 
 const ClientArea = () => {
   const { toast } = useToast();
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [client, setClient] = useState<Client | null>(null);
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [loginData, setLoginData] = useState({
-    cpf: '',
-    birthDate: ''
+    cpf: '123.456.789-00',
+    birthDate: '1995-12-19'
   });
 
-  const formatCPF = (cpf: string) => {
-    // Remove tudo que não é dígito
-    const numbers = cpf.replace(/\D/g, '');
+  // Auto-login on component mount
+  useEffect(() => {
+    handleAutoLogin();
+  }, []);
+
+  const handleAutoLogin = async () => {
+    setLoading(true);
     
-    // Aplica a máscara
+    try {
+      console.log('🚀 AUTO LOGIN - Buscando dados para CPF: 123.456.789-00');
+      
+      // Buscar cliente específico
+      const { data: clientData, error: clientError } = await supabase
+        .from('clients')
+        .select('*')
+        .eq('cpf', '123.456.789-00')
+        .eq('birth_date', '1995-12-19')
+        .single();
+
+      console.log('👤 Cliente encontrado:', clientData);
+      console.log('❌ Erro na busca:', clientError);
+
+      if (clientError) {
+        console.error('❌ Erro na consulta:', clientError);
+        toast({
+          title: "Erro no sistema",
+          description: `Erro na consulta: ${clientError.message}`,
+          variant: "destructive"
+        });
+        setLoading(false);
+        return;
+      }
+
+      if (!clientData) {
+        console.log('❌ NENHUM CLIENTE ENCONTRADO');
+        toast({
+          title: "Dados não encontrados",
+          description: "Cliente não encontrado para o CPF 123.456.789-00",
+          variant: "destructive"
+        });
+        setLoading(false);
+        return;
+      }
+
+      console.log('✅ CLIENTE ENCONTRADO:', clientData);
+      setClient(clientData);
+      
+      // Buscar boletos do cliente
+      const { data: invoicesData, error: invoicesError } = await supabase
+        .from('invoices')
+        .select('*')
+        .eq('client_id', clientData.id)
+        .order('due_date', { ascending: false });
+
+      if (invoicesError) {
+        console.error('⚠️ Erro ao carregar boletos:', invoicesError);
+      } else {
+        console.log('📋 Boletos carregados:', invoicesData?.length || 0);
+        setInvoices(invoicesData || []);
+      }
+
+      setIsAuthenticated(true);
+      toast({
+        title: "Acesso liberado!",
+        description: `Bem-vindo(a), ${clientData.name}!`
+      });
+      
+    } catch (error) {
+      console.error('💥 ERRO GERAL no auto-login:', error);
+      toast({
+        title: "Erro no acesso",
+        description: "Erro inesperado. Verifique o console para mais detalhes.",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const formatCPF = (cpf: string) => {
+    const numbers = cpf.replace(/\D/g, '');
     return numbers.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
   };
 
@@ -54,120 +130,19 @@ const ClientArea = () => {
     setLoading(true);
     
     try {
-      console.log('🚀 INICIANDO LOGIN - Dados fornecidos:');
-      console.log('   CPF formatado:', loginData.cpf);
-      console.log('   Data de nascimento:', loginData.birthDate);
-      
-      // Verificar configuração do Supabase
-      console.log('🔧 Configuração Supabase:');
-      console.log('   URL:', 'https://vhaypbkhuljrdmpqzgms.supabase.co');
-      console.log('   Projeto ID:', 'vhaypbkhuljrdmpqzgms');
-      
-      // Testar conexão básica
-      console.log('🔌 Testando conexão...');
-      const { data: testConnection, error: connectionError } = await supabase
-        .from('clients')
-        .select('count', { count: 'exact', head: true });
-      
-      if (connectionError) {
-        console.error('❌ ERRO DE CONEXÃO:', connectionError);
-        toast({
-          title: "Erro de conexão",
-          description: `Erro: ${connectionError.message}`,
-          variant: "destructive"
-        });
-        return;
-      }
-
-      console.log('✅ Conexão estabelecida. Total de registros:', testConnection);
-
-      // Listar TODOS os clientes para debug
-      console.log('📋 Listando TODOS os clientes na base:');
-      const { data: allClients, error: listError } = await supabase
-        .from('clients')
-        .select('*');
-      
-      if (listError) {
-        console.error('❌ Erro ao listar clientes:', listError);
-      } else {
-        console.log('👥 Clientes encontrados:', allClients?.length || 0);
-        if (allClients && allClients.length > 0) {
-          allClients.forEach((client, index) => {
-            console.log(`   Cliente ${index + 1}:`, {
-              id: client.id,
-              name: client.name,
-              cpf: client.cpf,
-              birth_date: client.birth_date,
-              created_at: client.created_at
-            });
-          });
-        } else {
-          console.log('   ⚠️ Nenhum cliente encontrado na tabela!');
-        }
-      }
-      
-      // Preparar dados para busca
       const cleanCPF = loginData.cpf.replace(/\D/g, '');
       const formattedCPF = loginData.cpf;
       
-      console.log('🔍 Preparando busca:');
-      console.log('   CPF limpo (números):', cleanCPF);
-      console.log('   CPF formatado:', formattedCPF);
-      console.log('   Data fornecida:', loginData.birthDate);
-      
-      // Buscar por CPF primeiro (testando múltiplos formatos)
-      console.log('🔍 Buscando por CPF...');
-      const { data: cpfMatches, error: cpfError } = await supabase
-        .from('clients')
-        .select('*')
-        .or(`cpf.eq.${formattedCPF},cpf.eq.${cleanCPF}`);
+      console.log('🔍 Buscando cliente com:', { cpf: formattedCPF, data: loginData.birthDate });
 
-      if (cpfError) {
-        console.error('❌ Erro na busca por CPF:', cpfError);
-      } else {
-        console.log('🎯 Resultados por CPF:', cpfMatches?.length || 0);
-        cpfMatches?.forEach((client, index) => {
-          console.log(`   Match ${index + 1}:`, {
-            name: client.name,
-            cpf: client.cpf,
-            birth_date: client.birth_date
-          });
-        });
-      }
-
-      // Buscar por data separadamente
-      console.log('🔍 Buscando por data de nascimento...');
-      const { data: dateMatches, error: dateError } = await supabase
-        .from('clients')
-        .select('*')
-        .eq('birth_date', loginData.birthDate);
-
-      if (dateError) {
-        console.error('❌ Erro na busca por data:', dateError);
-      } else {
-        console.log('📅 Resultados por data:', dateMatches?.length || 0);
-        dateMatches?.forEach((client, index) => {
-          console.log(`   Match ${index + 1}:`, {
-            name: client.name,
-            cpf: client.cpf,
-            birth_date: client.birth_date
-          });
-        });
-      }
-
-      // Busca combinada (CPF E data)
-      console.log('🔍 Busca combinada (CPF + Data)...');
       const { data: clientData, error: clientError } = await supabase
         .from('clients')
         .select('*')
         .or(`cpf.eq.${formattedCPF},cpf.eq.${cleanCPF}`)
         .eq('birth_date', loginData.birthDate);
 
-      console.log('🎯 Resultado da busca combinada:', clientData);
-      console.log('❌ Erro da busca combinada:', clientError);
-
       if (clientError) {
-        console.error('❌ Erro na consulta combinada:', clientError);
+        console.error('❌ Erro na consulta:', clientError);
         toast({
           title: "Erro no sistema",
           description: `Erro na consulta: ${clientError.message}`,
@@ -177,31 +152,24 @@ const ClientArea = () => {
       }
 
       if (!clientData || clientData.length === 0) {
-        console.log('❌ NENHUM CLIENTE ENCONTRADO na busca combinada');
-        
         toast({
           title: "Dados não encontrados",
-          description: "Verifique seu CPF e data de nascimento. Use os dados de teste: CPF 123.456.789-00 e data 1995-12-19",
+          description: "Verifique seu CPF e data de nascimento",
           variant: "destructive"
         });
         return;
       }
 
       const foundClient = clientData[0];
-      console.log('✅ CLIENTE ENCONTRADO:', foundClient);
       setClient(foundClient);
       
-      // Buscar boletos do cliente
       const { data: invoicesData, error: invoicesError } = await supabase
         .from('invoices')
         .select('*')
         .eq('client_id', foundClient.id)
         .order('due_date', { ascending: false });
 
-      if (invoicesError) {
-        console.error('⚠️ Erro ao carregar boletos:', invoicesError);
-      } else {
-        console.log('📋 Boletos carregados:', invoicesData?.length || 0);
+      if (!invoicesError) {
         setInvoices(invoicesData || []);
       }
 
@@ -215,7 +183,7 @@ const ClientArea = () => {
       console.error('💥 ERRO GERAL no login:', error);
       toast({
         title: "Erro no login",
-        description: "Erro inesperado. Verifique o console para mais detalhes.",
+        description: "Erro inesperado",
         variant: "destructive"
       });
     } finally {
@@ -267,6 +235,18 @@ const ClientArea = () => {
     }
   };
 
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div>
+          <p className="text-gray-600">Carregando área do cliente...</p>
+        </div>
+      </div>
+    );
+  }
+
   if (!isAuthenticated) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -298,9 +278,6 @@ const ClientArea = () => {
                       required
                       className="w-full"
                     />
-                    <p className="text-xs text-gray-500 mt-1">
-                      Digite apenas os números ou use a formatação com pontos e hífen
-                    </p>
                   </div>
                   
                   <div>
@@ -315,9 +292,6 @@ const ClientArea = () => {
                       required
                       className="w-full"
                     />
-                    <p className="text-xs text-gray-500 mt-1">
-                      Use o formato DD/MM/AAAA
-                    </p>
                   </div>
                   
                   <Button 
@@ -330,16 +304,9 @@ const ClientArea = () => {
                   </Button>
                   
                   <div className="text-xs text-gray-500 mt-4 p-3 bg-gray-50 rounded">
-                    <strong>⚠️ DADOS DE TESTE (use exatamente assim):</strong><br/>
-                    <strong>Opção 1:</strong><br/>
+                    <strong>📋 DADOS DE TESTE:</strong><br/>
                     CPF: 123.456.789-00<br/>
-                    Data: 1995-12-19<br/><br/>
-                    <strong>Opção 2:</strong><br/>
-                    CPF: 987.654.321-00<br/>
-                    Data: 1990-05-15<br/><br/>
-                    <strong>Opção 3:</strong><br/>
-                    CPF: 11111111111<br/>
-                    Data: 1985-03-10
+                    Data: 1995-12-19
                   </div>
                 </form>
               </CardContent>
