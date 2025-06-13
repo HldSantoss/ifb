@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { User, Lock, Calendar, CreditCard, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -36,39 +35,85 @@ const ClientArea = () => {
     birthDate: ''
   });
 
+  const formatCPF = (cpf: string) => {
+    // Remove tudo que não é dígito
+    const numbers = cpf.replace(/\D/g, '');
+    
+    // Aplica a máscara
+    return numbers.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+  };
+
+  const handleCPFChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const formatted = formatCPF(e.target.value);
+    setLoginData({...loginData, cpf: formatted});
+  };
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     
     try {
-      console.log('🔑 Tentando fazer login com:', loginData);
+      console.log('🔑 Tentando fazer login com CPF:', loginData.cpf);
+      console.log('🔑 Data de nascimento:', loginData.birthDate);
       
-      // Buscar cliente pelo CPF e data de nascimento
+      // Primeiro, vamos listar todos os clientes para debug
+      const { data: allClients, error: listError } = await supabase
+        .from('clients')
+        .select('cpf, birth_date, name');
+      
+      if (listError) {
+        console.error('❌ Erro ao listar clientes:', listError);
+      } else {
+        console.log('📋 Todos os clientes na base:', allClients);
+      }
+      
+      // Remove formatação do CPF para busca
+      const cleanCPF = loginData.cpf.replace(/\D/g, '');
+      const formattedCPF = cleanCPF.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+      
+      console.log('🔍 Buscando com CPF limpo:', cleanCPF);
+      console.log('🔍 Buscando com CPF formatado:', formattedCPF);
+      console.log('🔍 Data formatada para busca:', loginData.birthDate);
+      
+      // Tentar buscar com diferentes formatações de CPF
       const { data: clientData, error: clientError } = await supabase
         .from('clients')
         .select('*')
-        .eq('cpf', loginData.cpf)
-        .eq('birth_date', loginData.birthDate)
-        .single();
+        .or(`cpf.eq.${loginData.cpf},cpf.eq.${formattedCPF},cpf.eq.${cleanCPF}`)
+        .eq('birth_date', loginData.birthDate);
 
-      if (clientError || !clientData) {
-        console.error('❌ Cliente não encontrado:', clientError);
+      console.log('📊 Resultado da busca:', clientData);
+      console.log('📊 Erro da busca:', clientError);
+
+      if (clientError) {
+        console.error('❌ Erro na consulta:', clientError);
         toast({
-          title: "Dados não encontrados",
-          description: "Verifique seu CPF e data de nascimento.",
+          title: "Erro no sistema",
+          description: "Tente novamente mais tarde.",
           variant: "destructive"
         });
         return;
       }
 
-      console.log('✅ Cliente encontrado:', clientData);
-      setClient(clientData);
+      if (!clientData || clientData.length === 0) {
+        console.log('❌ Nenhum cliente encontrado com os dados fornecidos');
+        toast({
+          title: "Dados não encontrados",
+          description: "Verifique seu CPF e data de nascimento. Certifique-se de que estão corretos.",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      const foundClient = clientData[0];
+      console.log('✅ Cliente encontrado:', foundClient);
+      setClient(foundClient);
       
       // Buscar boletos do cliente
       const { data: invoicesData, error: invoicesError } = await supabase
         .from('invoices')
         .select('*')
-        .eq('client_id', clientData.id)
+        .eq('client_id', foundClient.id)
         .order('due_date', { ascending: false });
 
       if (invoicesError) {
@@ -81,7 +126,7 @@ const ClientArea = () => {
       setIsAuthenticated(true);
       toast({
         title: "Login realizado com sucesso!",
-        description: `Bem-vindo(a), ${clientData.name}!`
+        description: `Bem-vindo(a), ${foundClient.name}!`
       });
       
     } catch (error) {
@@ -165,11 +210,15 @@ const ClientArea = () => {
                       id="cpf"
                       type="text"
                       value={loginData.cpf}
-                      onChange={(e) => setLoginData({...loginData, cpf: e.target.value})}
+                      onChange={handleCPFChange}
                       placeholder="000.000.000-00"
+                      maxLength={14}
                       required
                       className="w-full"
                     />
+                    <p className="text-xs text-gray-500 mt-1">
+                      Digite apenas os números ou use a formatação com pontos e hífen
+                    </p>
                   </div>
                   
                   <div>
@@ -184,6 +233,9 @@ const ClientArea = () => {
                       required
                       className="w-full"
                     />
+                    <p className="text-xs text-gray-500 mt-1">
+                      Use o formato DD/MM/AAAA
+                    </p>
                   </div>
                   
                   <Button 
