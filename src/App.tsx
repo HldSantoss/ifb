@@ -11,6 +11,7 @@ import About from "./pages/About";
 import Contact from "./pages/Contact";
 import ClientArea from "./pages/ClientArea";
 import Admin from "./pages/Admin";
+import WhatsAppAdmin from "./pages/WhatsAppAdmin";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -30,6 +31,7 @@ const App = () => (
               <Route path="/contact" element={<Contact />} />
               <Route path="/client-area" element={<ClientArea />} />
               <Route path="/admin" element={<Admin />} />
+              <Route path="/whatsapp-admin" element={<WhatsAppAdmin />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>

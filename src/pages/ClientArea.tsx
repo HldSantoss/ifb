@@ -1,13 +1,11 @@
 
 import { useState, useEffect } from 'react';
-import { User, Lock, Calendar, CreditCard, FileText, MessageCircle } from 'lucide-react';
+import { User, Lock, Calendar, CreditCard, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import WhatsAppSender from '@/components/WhatsAppSender';
 
 interface Client {
   id: string;
@@ -25,10 +23,6 @@ interface Invoice {
   amount: number;
   due_date: string;
   status: string;
-  whatsapp_sent: boolean;
-  whatsapp_sent_at: string | null;
-  whatsapp_error: string | null;
-  whatsapp_attempts: number;
 }
 
 const ClientArea = () => {
@@ -273,85 +267,58 @@ const ClientArea = () => {
             </CardContent>
           </Card>
 
-          {/* Boletos com abas */}
-          <Tabs defaultValue="boletos" className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="boletos" className="flex items-center">
-                <CreditCard className="w-4 h-4 mr-2" />
+          {/* Boletos */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <CreditCard className="w-5 h-5 mr-2" />
                 Seus Boletos
-              </TabsTrigger>
-              <TabsTrigger value="whatsapp" className="flex items-center">
-                <MessageCircle className="w-4 h-4 mr-2" />
-                Envio WhatsApp
-              </TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="boletos">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center">
-                    <CreditCard className="w-5 h-5 mr-2" />
-                    Lista de Boletos
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {invoices.length > 0 ? (
-                    <div className="space-y-4">
-                      {invoices.map((invoice) => (
-                        <div key={invoice.id} className="border rounded-lg p-4">
-                          <div className="flex justify-between items-start mb-2">
-                            <div>
-                              <h3 className="font-semibold text-lg">
-                                Boleto #{invoice.invoice_number}
-                              </h3>
-                              <p className="text-gray-600">{invoice.description}</p>
-                            </div>
-                            <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(invoice.status)}`}>
-                              {getStatusText(invoice.status)}
-                            </span>
-                          </div>
-                          
-                          <div className="grid md:grid-cols-3 gap-4 mt-4">
-                            <div>
-                              <p className="text-sm text-gray-600">Valor</p>
-                              <p className="font-semibold text-lg">{formatCurrency(invoice.amount)}</p>
-                            </div>
-                            <div>
-                              <p className="text-sm text-gray-600">Vencimento</p>
-                              <p className="font-semibold">{formatDate(invoice.due_date)}</p>
-                            </div>
-                            <div className="flex items-end">
-                              <Button size="sm" className="bg-black hover:bg-gray-800">
-                                <FileText className="w-4 h-4 mr-1" />
-                                Visualizar
-                              </Button>
-                            </div>
-                          </div>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {invoices.length > 0 ? (
+                <div className="space-y-4">
+                  {invoices.map((invoice) => (
+                    <div key={invoice.id} className="border rounded-lg p-4">
+                      <div className="flex justify-between items-start mb-2">
+                        <div>
+                          <h3 className="font-semibold text-lg">
+                            Boleto #{invoice.invoice_number}
+                          </h3>
+                          <p className="text-gray-600">{invoice.description}</p>
                         </div>
-                      ))}
+                        <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(invoice.status)}`}>
+                          {getStatusText(invoice.status)}
+                        </span>
+                      </div>
+                      
+                      <div className="grid md:grid-cols-3 gap-4 mt-4">
+                        <div>
+                          <p className="text-sm text-gray-600">Valor</p>
+                          <p className="font-semibold text-lg">{formatCurrency(invoice.amount)}</p>
+                        </div>
+                        <div>
+                          <p className="text-sm text-gray-600">Vencimento</p>
+                          <p className="font-semibold">{formatDate(invoice.due_date)}</p>
+                        </div>
+                        <div className="flex items-end">
+                          <Button size="sm" className="bg-black hover:bg-gray-800">
+                            <FileText className="w-4 h-4 mr-1" />
+                            Visualizar
+                          </Button>
+                        </div>
+                      </div>
                     </div>
-                  ) : (
-                    <div className="text-center py-8">
-                      <CreditCard className="w-12 h-12 mx-auto text-gray-400 mb-4" />
-                      <p className="text-gray-600">Nenhum boleto encontrado.</p>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            <TabsContent value="whatsapp">
-              <Card>
-                <CardContent className="p-6">
-                  <WhatsAppSender 
-                    invoices={invoices}
-                    clientName={client?.name || ''}
-                    onInvoicesUpdate={setInvoices}
-                  />
-                </CardContent>
-              </Card>
-            </TabsContent>
-          </Tabs>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-8">
+                  <CreditCard className="w-12 h-12 mx-auto text-gray-400 mb-4" />
+                  <p className="text-gray-600">Nenhum boleto encontrado.</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
         </div>
       </section>
     </div>

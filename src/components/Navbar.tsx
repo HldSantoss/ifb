@@ -13,6 +13,7 @@ const Navbar = () => {
     { name: 'Sobre Nós', path: '/about' },
     { name: 'Fale Conosco', path: '/contact' },
     { name: 'Área do Cliente', path: '/client-area' },
+    { name: 'Admin WhatsApp', path: '/whatsapp-admin' },
   ];
 
   const isActive = (path: string) => location.pathname === path;
