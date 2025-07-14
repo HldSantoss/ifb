@@ -125,6 +125,10 @@ export type Database = {
           project_id: string
           status: string
           updated_at: string
+          whatsapp_attempts: number | null
+          whatsapp_error: string | null
+          whatsapp_sent: boolean | null
+          whatsapp_sent_at: string | null
         }
         Insert: {
           amount: number
@@ -137,6 +141,10 @@ export type Database = {
           project_id: string
           status?: string
           updated_at?: string
+          whatsapp_attempts?: number | null
+          whatsapp_error?: string | null
+          whatsapp_sent?: boolean | null
+          whatsapp_sent_at?: string | null
         }
         Update: {
           amount?: number
@@ -149,6 +157,10 @@ export type Database = {
           project_id?: string
           status?: string
           updated_at?: string
+          whatsapp_attempts?: number | null
+          whatsapp_error?: string | null
+          whatsapp_sent?: boolean | null
+          whatsapp_sent_at?: string | null
         }
         Relationships: [
           {
