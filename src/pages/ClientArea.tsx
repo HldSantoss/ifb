@@ -27,98 +27,13 @@ interface Invoice {
 
 const ClientArea = () => {
   const { toast } = useToast();
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [client, setClient] = useState<Client | null>(null);
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [loginData, setLoginData] = useState({
-    cpf: '',
-    birthDate: ''
+    cpf: ''
   });
-
-  // Auto-login on component mount for testing
-  useEffect(() => {
-    handleAutoLogin();
-  }, []);
-
-  const handleAutoLogin = async () => {
-    setLoading(true);
-    
-    try {
-      console.log('🚀 Iniciando auto-login para CPF: 123.456.789-00');
-      
-      // Buscar cliente específico
-      const { data: clientData, error: clientError } = await supabase
-        .from('clients')
-        .select('*')
-        .eq('cpf', '123.456.789-00')
-        .eq('birth_date', '1995-12-19')
-        .single();
-
-      console.log('👤 Dados do cliente:', clientData);
-      console.log('❌ Erro na consulta:', clientError);
-
-      if (clientError) {
-        console.error('❌ Erro na consulta do cliente:', clientError);
-        toast({
-          title: "Erro no sistema",
-          description: `Erro na consulta: ${clientError.message}`,
-          variant: "destructive"
-        });
-        setLoading(false);
-        return;
-      }
-
-      if (!clientData) {
-        console.log('❌ Cliente não encontrado');
-        toast({
-          title: "Cliente não encontrado",
-          description: "Dados do cliente não foram encontrados",
-          variant: "destructive"
-        });
-        setLoading(false);
-        return;
-      }
-
-      console.log('✅ Cliente autenticado:', clientData.name);
-      setClient(clientData);
-      
-      // Buscar boletos do cliente
-      const { data: invoicesData, error: invoicesError } = await supabase
-        .from('invoices')
-        .select('*')
-        .eq('client_id', clientData.id)
-        .order('due_date', { ascending: false });
-
-      if (invoicesError) {
-        console.error('⚠️ Erro ao carregar boletos:', invoicesError);
-        toast({
-          title: "Aviso",
-          description: "Erro ao carregar boletos, mas acesso liberado",
-          variant: "default"
-        });
-      } else {
-        console.log('📋 Boletos carregados:', invoicesData?.length || 0);
-        setInvoices(invoicesData || []);
-      }
-
-      setIsAuthenticated(true);
-      toast({
-        title: "Acesso liberado!",
-        description: `Bem-vindo(a), ${clientData.name}!`
-      });
-      
-    } catch (error) {
-      console.error('💥 Erro geral no auto-login:', error);
-      toast({
-        title: "Erro no acesso",
-        description: "Erro inesperado no sistema",
-        variant: "destructive"
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const formatCPF = (cpf: string) => {
     const numbers = cpf.replace(/\D/g, '');
@@ -135,19 +50,27 @@ const ClientArea = () => {
     setLoading(true);
     
     try {
-      console.log('🔍 Tentando login com:', { cpf: loginData.cpf, data: loginData.birthDate });
+      console.log('🔍 Tentando login com CPF:', loginData.cpf);
 
       const { data: clientData, error: clientError } = await supabase
         .from('clients')
         .select('*')
         .eq('cpf', loginData.cpf)
-        .eq('birth_date', loginData.birthDate)
-        .single();
+        .maybeSingle();
 
-      if (clientError || !clientData) {
+      if (clientError) {
         toast({
-          title: "Dados não encontrados",
-          description: "Verifique seu CPF e data de nascimento",
+          title: "Erro no sistema",
+          description: "Erro ao consultar dados",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      if (!clientData) {
+        toast({
+          title: "CPF não encontrado",
+          description: "Verifique seu CPF",
           variant: "destructive"
         });
         return;
@@ -165,7 +88,7 @@ const ClientArea = () => {
       setIsAuthenticated(true);
       
       toast({
-        title: "Login realizado com sucesso!",
+        title: "Acesso liberado!",
         description: `Bem-vindo(a), ${clientData.name}!`
       });
       
@@ -185,7 +108,7 @@ const ClientArea = () => {
     setIsAuthenticated(false);
     setClient(null);
     setInvoices([]);
-    setLoginData({ cpf: '', birthDate: '' });
+    setLoginData({ cpf: '' });
   };
 
   const formatCurrency = (value: number) => {
@@ -269,20 +192,6 @@ const ClientArea = () => {
                     />
                   </div>
                   
-                  <div>
-                    <label htmlFor="birthDate" className="block text-sm font-medium mb-2">
-                      Data de Nascimento *
-                    </label>
-                    <Input
-                      id="birthDate"
-                      type="date"
-                      value={loginData.birthDate}
-                      onChange={(e) => setLoginData({...loginData, birthDate: e.target.value})}
-                      required
-                      className="w-full"
-                    />
-                  </div>
-                  
                   <Button 
                     type="submit" 
                     className="w-full bg-black hover:bg-gray-800"
@@ -293,9 +202,8 @@ const ClientArea = () => {
                   </Button>
                   
                   <div className="text-xs text-gray-500 mt-4 p-3 bg-gray-50 rounded">
-                    <strong>📋 DADOS DE TESTE:</strong><br/>
-                    CPF: 123.456.789-00<br/>
-                    Data: 1995-12-19
+                    <strong>📋 CPF DE TESTE:</strong><br/>
+                    123.456.789-00
                   </div>
                 </form>
               </CardContent>
