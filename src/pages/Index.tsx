@@ -119,29 +119,12 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Hero Section with Banner */}
-      <section className="relative min-h-screen flex items-center justify-center text-white overflow-hidden">
-        <div className="absolute inset-0 z-0">
-          <img 
-            src="/lovable-uploads/fb4fe2ed-59f1-4b9e-a1e4-96a07f899514.png" 
-            alt="Banner IFB Incorporadora" 
-            className="w-full h-full object-cover"
-          />
-        </div>
-        <div className="relative z-10 container mx-auto px-4 text-center">
-          <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in">
-            <Button asChild size="lg" className="bg-black text-white hover:bg-gray-800">
-              <Link to="/contact">
-                Fale Conosco
-                <ArrowRight className="ml-2 w-5 h-5" />
-              </Link>
-            </Button>
-            <Button asChild size="lg" className="bg-black text-white hover:bg-gray-800 border-black">
-              <Link to="/about">
-                Conheça Nossa História
-              </Link>
-            </Button>
-          </div>
-        </div>
+      <section className="relative h-screen bg-white overflow-hidden">
+        <img 
+          src="/lovable-uploads/fb4fe2ed-59f1-4b9e-a1e4-96a07f899514.png" 
+          alt="Banner IFB Incorporadora" 
+          className="w-full h-full object-contain"
+        />
       </section>
 
       {/* Properties Section with Carousel */}
@@ -149,7 +132,7 @@ const Index = () => {
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold mb-6">
-              Nossos Empreendimentos
+              Nossos Lançamentos
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
               Descubra projetos exclusivos que combinam arquitetura inovadora, 
@@ -165,30 +148,34 @@ const Index = () => {
             <div className="relative">
               <div className="overflow-hidden" ref={emblaRef}>
                 <div className="flex">
-                  {properties.map((property) => (
-                    <div key={property.id} className="flex-[0_0_100%] md:flex-[0_0_50%] lg:flex-[0_0_33.33%] xl:flex-[0_0_25%] min-w-0 px-4">
-                      <div className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
-                        <div className="relative">
-                          <img 
-                            src={property.image} 
-                            alt={property.title}
-                            className="w-full h-48 object-cover"
-                          />
-                          <span className={`absolute top-4 left-4 text-white text-sm px-3 py-1 rounded-md transition-transform duration-300 ${getStatusInfo(property.status || 'em obra').bg}`}>
-                            {getStatusInfo(property.status || 'em obra').text}
-                          </span>
-                        </div>
-                        <div className="p-6">
-                          <h3 className="text-xl font-bold text-gray-900 mb-2">{property.title}</h3>
-                          <div className="flex items-center text-red-600 mb-4">
-                            <MapPin className="w-4 h-4 mr-1" />
-                            <span className="text-sm">{property.location}</span>
+                  {properties.map((property, index) => {
+                    const statuses = ['lançamento', 'em obra', 'pronto para morar'];
+                    const status = statuses[index % 3];
+                    
+                    return (
+                      <div key={property.id} className="flex-[0_0_100%] md:flex-[0_0_50%] lg:flex-[0_0_33.33%] xl:flex-[0_0_25%] min-w-0 px-4">
+                        <div className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
+                          <div className="relative">
+                            <img 
+                              src={property.image} 
+                              alt={property.title}
+                              className="w-full h-48 object-cover"
+                            />
                           </div>
-                          <p className="text-gray-600 text-sm mb-4 line-clamp-3">{property.description}</p>
+                          <div className="p-6">
+                            <span className="text-white text-sm mb-4 bg-black transition-transform duration-300 p-2 rounded inline-block hover:bg-gray-800">
+                              {status}
+                            </span>
+                            <h3 className="text-xl font-bold text-gray-900 mb-2">{property.title}</h3>
+                            <div className="flex items-center text-gray-600 mb-4">
+                              <MapPin className="w-4 h-4 mr-1 text-red-500" />
+                              <span className="text-sm">{property.location}</span>
+                            </div>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
               
@@ -262,28 +249,28 @@ const Index = () => {
       </section>
 
       {/* Stats Section */}
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-black">
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-4 gap-8 text-center">
             <div className="p-8">
-              <Award className="w-12 h-12 mx-auto mb-4 text-gray-800" />
-              <div className="text-4xl font-bold text-gray-800 mb-2">25+</div>
-              <div className="text-lg text-gray-600">Anos de Experiência</div>
+              <Award className="w-12 h-12 mx-auto mb-4 text-white" />
+              <div className="text-4xl font-bold text-white mb-2">25+</div>
+              <div className="text-lg text-gray-300">Anos de Experiência</div>
             </div>
             <div className="p-8">
-              <Building className="w-12 h-12 mx-auto mb-4 text-gray-800" />
-              <div className="text-4xl font-bold text-gray-800 mb-2">150+</div>
-              <div className="text-lg text-gray-600">Empreendimentos Entregues</div>
+              <Building className="w-12 h-12 mx-auto mb-4 text-white" />
+              <div className="text-4xl font-bold text-white mb-2">150+</div>
+              <div className="text-lg text-gray-300">Empreendimentos Entregues</div>
             </div>
             <div className="p-8">
-              <Users className="w-12 h-12 mx-auto mb-4 text-gray-800" />
-              <div className="text-4xl font-bold text-gray-800 mb-2">5000+</div>
-              <div className="text-lg text-gray-600">Famílias Atendidas</div>
+              <Users className="w-12 h-12 mx-auto mb-4 text-white" />
+              <div className="text-4xl font-bold text-white mb-2">5000+</div>
+              <div className="text-lg text-gray-300">Famílias Atendidas</div>
             </div>
             <div className="p-8">
-              <Building className="w-12 h-12 mx-auto mb-4 text-gray-800" />
-              <div className="text-4xl font-bold text-gray-800 mb-2">+20</div>
-              <div className="text-lg text-gray-600">Projetos em Andamento</div>
+              <Building className="w-12 h-12 mx-auto mb-4 text-white" />
+              <div className="text-4xl font-bold text-white mb-2">+20</div>
+              <div className="text-lg text-gray-300">Projetos em Andamento</div>
             </div>
           </div>
         </div>
@@ -334,30 +321,6 @@ const Index = () => {
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-r from-gray-900 to-black text-white">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="text-4xl font-bold mb-6">
-            Pronto para Realizar seu Sonho?
-          </h2>
-          <p className="text-xl mb-8 max-w-2xl mx-auto opacity-90">
-            Entre em contato conosco e descubra como podemos ajudar você a 
-            encontrar o empreendimento perfeito para sua família.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button asChild size="lg" className="bg-white text-black hover:bg-gray-100">
-              <Link to="/contact">
-                Solicitar Informações
-              </Link>
-            </Button>
-            <Button asChild variant="outline" size="lg" className="border-white text-white hover:bg-white hover:text-black">
-              <Link to="/client-area">
-                Área do Cliente
-              </Link>
-            </Button>
-          </div>
-        </div>
-      </section>
     </div>
   );
 };

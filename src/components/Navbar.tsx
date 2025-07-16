@@ -39,7 +39,7 @@ const Navbar = () => {
                 to={item.path}
                 className={item.name === '2° Via Boleto' 
                   ? 'bg-black text-white px-4 py-3 border rounded-xl hover:text-white'
-                  : `text-sm font-medium transition-colors hover:text-gray-600 ${
+                  : `text-base font-medium transition-colors hover:text-gray-600 ${
                       isActive(item.path) 
                         ? 'text-gray-800 border-b-2 border-gray-800' 
                         : 'text-gray-700'
