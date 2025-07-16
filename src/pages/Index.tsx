@@ -1,10 +1,14 @@
 
 import { useState, useEffect } from 'react';
-import { ArrowRight, Award, Users, Building } from 'lucide-react';
+import { ArrowRight, Award, Users, Building, MapPin, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import PropertyCard from '@/components/PropertyCard';
 import { supabase } from '@/integrations/supabase/client';
+import useEmblaCarousel from 'embla-carousel-react';
+import floorPlan1 from '@/assets/floor-plan-1.png';
+import floorPlan2 from '@/assets/floor-plan-2.png';
+import certification from '@/assets/certification.png';
 
 interface Empreendimento {
   id: string;
@@ -21,6 +25,12 @@ interface Empreendimento {
 const Index = () => {
   const [empreendimentos, setEmpreendimentos] = useState<Empreendimento[]>([]);
   const [loading, setLoading] = useState(true);
+  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, align: 'start' });
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    phone: ''
+  });
 
   useEffect(() => {
     loadEmpreendimentos();
@@ -52,6 +62,46 @@ const Index = () => {
     }
   };
 
+  const scrollPrev = () => emblaApi && emblaApi.scrollPrev();
+  const scrollNext = () => emblaApi && emblaApi.scrollNext();
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async () => {
+    try {
+      const { error } = await supabase
+        .from('contatos')
+        .insert([{
+          nome: formData.name,
+          email: formData.email,
+          telefone: formData.phone,
+          mensagem: 'Contato via formulário'
+        }]);
+
+      if (error) throw error;
+
+      alert('Mensagem enviada com sucesso!');
+      setFormData({ name: '', email: '', phone: '' });
+    } catch (error) {
+      alert('Erro ao enviar mensagem. Tente novamente.');
+    }
+  };
+
+  const getStatusInfo = (status: string) => {
+    switch (status.toLowerCase()) {
+      case 'lançamento':
+        return { text: 'lançamento', bg: 'bg-black hover:bg-gray-800' };
+      case 'em obra':
+        return { text: 'em obra', bg: 'bg-black hover:bg-gray-800' };
+      case 'pronto para morar':
+        return { text: 'pronto para morar', bg: 'bg-black hover:bg-gray-800' };
+      default:
+        return { text: 'em obra', bg: 'bg-black hover:bg-gray-800' };
+    }
+  };
+
   // Convert empreendimentos to the format expected by PropertyCard
   const properties = empreendimentos.map(emp => ({
     id: emp.id,
@@ -60,26 +110,24 @@ const Index = () => {
     price: '', // Removed price display
     image: emp.imagem_url || '/lovable-uploads/7477db64-59a1-41c0-9e27-d1fae676b2ec.png',
     description: emp.descricao || 'Descrição não disponível',
-    launchDate: emp.data_lancamento
+    launchDate: emp.data_lancamento,
+    status: emp.status
   }));
 
   console.log('🏠 Properties finais:', properties);
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center justify-center text-white overflow-hidden bg-gradient-to-r from-gray-900 via-black to-gray-800">
+      {/* Hero Section with Banner */}
+      <section className="relative min-h-screen flex items-center justify-center text-white overflow-hidden">
+        <div className="absolute inset-0 z-0">
+          <img 
+            src="/lovable-uploads/fb4fe2ed-59f1-4b9e-a1e4-96a07f899514.png" 
+            alt="Banner IFB Incorporadora" 
+            className="w-full h-full object-cover"
+          />
+        </div>
         <div className="relative z-10 container mx-auto px-4 text-center">
-          <h1 className="text-6xl md:text-7xl font-bold mb-6 animate-fade-in">
-            Construindo o
-            <span className="block bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
-              Futuro
-            </span>
-          </h1>
-          <p className="text-xl md:text-2xl mb-8 max-w-3xl mx-auto opacity-90 animate-fade-in">
-            Empreendimentos de excelência que transformam sonhos em realidade. 
-            Mais de 25 anos criando espaços únicos com design moderno e sustentabilidade.
-          </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in">
             <Button asChild size="lg" className="bg-black text-white hover:bg-gray-800">
               <Link to="/contact">
@@ -96,7 +144,7 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Properties Section */}
+      {/* Properties Section with Carousel */}
       <section className="py-20 bg-white">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
@@ -114,10 +162,49 @@ const Index = () => {
               <p className="text-gray-600 text-lg">Carregando empreendimentos...</p>
             </div>
           ) : properties.length > 0 ? (
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-              {properties.map((property) => (
-                <PropertyCard key={property.id} property={property} />
-              ))}
+            <div className="relative">
+              <div className="overflow-hidden" ref={emblaRef}>
+                <div className="flex">
+                  {properties.map((property) => (
+                    <div key={property.id} className="flex-[0_0_100%] md:flex-[0_0_50%] lg:flex-[0_0_33.33%] xl:flex-[0_0_25%] min-w-0 px-4">
+                      <div className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
+                        <div className="relative">
+                          <img 
+                            src={property.image} 
+                            alt={property.title}
+                            className="w-full h-48 object-cover"
+                          />
+                          <span className={`absolute top-4 left-4 text-white text-sm px-3 py-1 rounded-md transition-transform duration-300 ${getStatusInfo(property.status || 'em obra').bg}`}>
+                            {getStatusInfo(property.status || 'em obra').text}
+                          </span>
+                        </div>
+                        <div className="p-6">
+                          <h3 className="text-xl font-bold text-gray-900 mb-2">{property.title}</h3>
+                          <div className="flex items-center text-red-600 mb-4">
+                            <MapPin className="w-4 h-4 mr-1" />
+                            <span className="text-sm">{property.location}</span>
+                          </div>
+                          <p className="text-gray-600 text-sm mb-4 line-clamp-3">{property.description}</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              
+              {/* Carousel Controls */}
+              <button 
+                onClick={scrollPrev}
+                className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black text-white p-2 rounded-full hover:bg-gray-800 transition-colors z-10"
+              >
+                <ChevronLeft className="w-6 h-6" />
+              </button>
+              <button 
+                onClick={scrollNext}
+                className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black text-white p-2 rounded-full hover:bg-gray-800 transition-colors z-10"
+              >
+                <ChevronRight className="w-6 h-6" />
+              </button>
             </div>
           ) : (
             <div className="text-center py-12">
@@ -138,8 +225,44 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Stats Section */}
+      {/* Nossos Padrões Section */}
       <section className="py-20 bg-gray-50">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">
+              Nossos Padrões
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Plantas inteligentes pensadas para o seu conforto.
+            </p>
+          </div>
+          
+          <div className="grid md:grid-cols-2 gap-12 max-w-6xl mx-auto">
+            <div className="bg-white rounded-xl shadow-lg p-8 hover:shadow-xl transition-shadow duration-300">
+              <img 
+                src={floorPlan1} 
+                alt="Planta humanizada 1-2 dormitórios"
+                className="w-full h-64 object-contain mb-6"
+              />
+              <h3 className="text-2xl font-bold text-gray-900 mb-4 text-center">1 e 2 Dormitórios</h3>
+              <p className="text-gray-600 text-center">Espaços otimizados com design inteligente para máximo conforto e funcionalidade.</p>
+            </div>
+            
+            <div className="bg-white rounded-xl shadow-lg p-8 hover:shadow-xl transition-shadow duration-300">
+              <img 
+                src={floorPlan2} 
+                alt="Planta humanizada 2-3 dormitórios"
+                className="w-full h-64 object-contain mb-6"
+              />
+              <h3 className="text-2xl font-bold text-gray-900 mb-4 text-center">2 e 3 Dormitórios</h3>
+              <p className="text-gray-600 text-center">Ambientes amplos e versáteis, perfeitos para famílias que buscam qualidade de vida.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Stats Section */}
+      <section className="py-20 bg-white">
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-4 gap-8 text-center">
             <div className="p-8">
@@ -161,6 +284,51 @@ const Index = () => {
               <Building className="w-12 h-12 mx-auto mb-4 text-gray-800" />
               <div className="text-4xl font-bold text-gray-800 mb-2">+20</div>
               <div className="text-lg text-gray-600">Projetos em Andamento</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Contact Form Section */}
+      <section id="contato" className="bg-white text-black py-16">
+        <div className="container flex flex-col-reverse sm:flex-row items-center sm:gap-0 gap-12 justify-between px-4 sm:px-56 text-center">
+          <div className="flex sm:flex-col gap-10 items-center">
+            <img src="/lovable-uploads/33265cf6-499d-4191-a3ba-8586455ad12e.png" alt="logo" className="sm:w-56 sm:h-40 w-28 h-16 object-cover" />
+            <img src={certification} alt="certificado" className="sm:w-52 sm:h-12 w-44 h-10 object-cover" />
+          </div>
+          <div>
+            <h2 className="text-3xl font-bold mb-8">Entre em Contato</h2>
+            <div className="max-w-lg mx-auto">
+              <input
+                type="text"
+                name="name"
+                placeholder="Seu Nome"
+                value={formData.name}
+                onChange={handleInputChange}
+                className="w-full p-3 mb-4 border border-gray-300 rounded"
+              />
+              <input
+                type="email"
+                name="email"
+                placeholder="Seu E-mail"
+                value={formData.email}
+                onChange={handleInputChange}
+                className="w-full p-3 mb-4 border border-gray-300 rounded"
+              />
+              <input
+                type="tel"
+                name="phone"
+                placeholder="Seu Telefone"
+                value={formData.phone}
+                onChange={handleInputChange}
+                className="w-full p-3 mb-4 border border-gray-300 rounded"
+              />
+              <button
+                onClick={handleSubmit}
+                className="w-full bg-black text-white py-3 rounded-lg font-semibold hover:bg-gray-800"
+              >
+                Enviar
+              </button>
             </div>
           </div>
         </div>

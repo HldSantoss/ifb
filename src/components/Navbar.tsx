@@ -27,7 +27,7 @@ const Navbar = () => {
             <img 
               src="/lovable-uploads/33265cf6-499d-4191-a3ba-8586455ad12e.png" 
               alt="IFB Incorporadora" 
-              className="h-16 w-auto"
+              className="h-20 w-auto"
             />
           </Link>
 
@@ -37,11 +37,14 @@ const Navbar = () => {
               <Link
                 key={item.name}
                 to={item.path}
-                className={`text-sm font-medium transition-colors hover:text-gray-600 ${
-                  isActive(item.path) 
-                    ? 'text-gray-800 border-b-2 border-gray-800' 
-                    : 'text-gray-700'
-                }`}
+                className={item.name === '2° Via Boleto' 
+                  ? 'bg-black text-white px-4 py-3 border rounded-xl hover:text-white'
+                  : `text-sm font-medium transition-colors hover:text-gray-600 ${
+                      isActive(item.path) 
+                        ? 'text-gray-800 border-b-2 border-gray-800' 
+                        : 'text-gray-700'
+                    }`
+                }
               >
                 {item.name}
               </Link>
