@@ -10,9 +10,10 @@ const Navbar = () => {
 
   const navItems = [
     { name: 'Início', path: '/' },
+    { name: 'Portfólio', path: '/portfolio' },
     { name: 'Sobre Nós', path: '/about' },
     { name: 'Fale Conosco', path: '/contact' },
-    { name: 'Área do Cliente', path: '/client-area' },
+    { name: '2° Via Boleto', path: '/client-area' },
   ];
 
   const isActive = (path: string) => location.pathname === path;
@@ -20,13 +21,13 @@ const Navbar = () => {
   return (
     <nav className="bg-white shadow-lg sticky top-0 z-50">
       <div className="container mx-auto px-4">
-        <div className="flex justify-between items-center h-16">
+        <div className="flex justify-between items-center h-28">
           {/* Logo */}
           <Link to="/" className="flex items-center">
             <img 
               src="/lovable-uploads/33265cf6-499d-4191-a3ba-8586455ad12e.png" 
               alt="IFB Incorporadora" 
-              className="h-10 w-auto"
+              className="h-16 w-auto"
             />
           </Link>
 
