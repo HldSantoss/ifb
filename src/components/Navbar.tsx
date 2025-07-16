@@ -27,7 +27,7 @@ const Navbar = () => {
             <img 
               src="/lovable-uploads/33265cf6-499d-4191-a3ba-8586455ad12e.png" 
               alt="IFB Incorporadora" 
-              className="h-10 w-auto"
+              className="h-16 w-auto"
             />
           </Link>
 
