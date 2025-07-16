@@ -119,11 +119,11 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Hero Section with Banner */}
-      <section className="relative w-full h-screen overflow-hidden">
+      <section className="relative w-full h-screen overflow-hidden -mt-20">
         <img 
           src="/lovable-uploads/fb4fe2ed-59f1-4b9e-a1e4-96a07f899514.png" 
           alt="Banner IFB Incorporadora" 
-          className="w-full h-full object-cover"
+          className="w-full h-full object-contain"
         />
       </section>
 
@@ -154,7 +154,7 @@ const Index = () => {
                     
                     return (
                       <div key={property.id} className="flex-[0_0_100%] md:flex-[0_0_50%] lg:flex-[0_0_33.33%] xl:flex-[0_0_25%] min-w-0 px-4">
-                        <div className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
+                         <div className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 h-96">
                            <div className="relative">
                              <img 
                                src={property.image} 
@@ -162,14 +162,16 @@ const Index = () => {
                                className="w-full h-64 object-cover"
                              />
                           </div>
-                          <div className="p-6">
-                            <span className="text-white text-sm mb-4 bg-black transition-transform duration-300 p-2 rounded inline-block hover:bg-gray-800">
-                              {status}
-                            </span>
-                            <h3 className="text-xl font-bold text-gray-900 mb-2">{property.title}</h3>
-                            <div className="flex items-center text-gray-600 mb-4">
+                          <div className="p-6 h-32 flex flex-col justify-between">
+                            <div>
+                              <span className="text-white text-sm mb-2 bg-black transition-transform duration-300 p-2 rounded inline-block hover:bg-gray-800">
+                                {status}
+                              </span>
+                              <h3 className="text-lg font-bold text-gray-900 mb-1 line-clamp-2">{property.title}</h3>
+                            </div>
+                            <div className="flex items-center text-gray-600">
                               <MapPin className="w-4 h-4 mr-1 text-red-500" />
-                              <span className="text-sm">{property.location}</span>
+                              <span className="text-sm line-clamp-1">{property.location}</span>
                             </div>
                           </div>
                         </div>
@@ -201,7 +203,7 @@ const Index = () => {
             </div>
           )}
           
-          <div className="text-center mt-16 mb-8">
+          <div className="text-center mt-8">
             <Button asChild size="lg" className="bg-black hover:bg-gray-800">
               <Link to="/contact">
                 Ver Todos os Empreendimentos
@@ -213,7 +215,7 @@ const Index = () => {
       </section>
 
       {/* Nossos Padrões Section */}
-      <section className="py-20 bg-gray-50">
+      <section className="py-20 bg-gray-50 pb-8">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold mb-6">
@@ -249,79 +251,28 @@ const Index = () => {
       </section>
 
       {/* Stats Section */}
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-black">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-              25 Anos de Experiência
-            </h2>
-          </div>
-          
           <div className="grid md:grid-cols-4 gap-8 text-center">
             <div className="p-8">
-              <Award className="w-12 h-12 mx-auto mb-4 text-yellow-500" />
-              <div className="text-4xl font-bold text-gray-900 mb-2">25+</div>
-              <div className="text-lg text-gray-700 font-semibold">Anos de Experiência</div>
+              <Award className="w-12 h-12 mx-auto mb-4 text-yellow-400" />
+              <div className="text-4xl font-bold text-white mb-2">25+</div>
+              <div className="text-lg text-gray-300 font-semibold">Anos de Experiência</div>
             </div>
             <div className="p-8">
-              <Building className="w-12 h-12 mx-auto mb-4 text-blue-500" />
-              <div className="text-4xl font-bold text-gray-900 mb-2">150+</div>
-              <div className="text-lg text-gray-700 font-semibold">Empreendimentos Entregues</div>
+              <Building className="w-12 h-12 mx-auto mb-4 text-blue-400" />
+              <div className="text-4xl font-bold text-white mb-2">150+</div>
+              <div className="text-lg text-gray-300 font-semibold">Empreendimentos Entregues</div>
             </div>
             <div className="p-8">
-              <Users className="w-12 h-12 mx-auto mb-4 text-green-500" />
-              <div className="text-4xl font-bold text-gray-900 mb-2">5000+</div>
-              <div className="text-lg text-gray-700 font-semibold">Famílias Atendidas</div>
+              <Users className="w-12 h-12 mx-auto mb-4 text-green-400" />
+              <div className="text-4xl font-bold text-white mb-2">5000+</div>
+              <div className="text-lg text-gray-300 font-semibold">Famílias Atendidas</div>
             </div>
             <div className="p-8">
-              <Building className="w-12 h-12 mx-auto mb-4 text-purple-500" />
-              <div className="text-4xl font-bold text-gray-900 mb-2">+20</div>
-              <div className="text-lg text-gray-700 font-semibold">Projetos em Andamento</div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Contact Form Section */}
-      <section id="contato" className="bg-white text-black py-16">
-        <div className="container flex flex-col-reverse sm:flex-row items-center sm:gap-0 gap-12 justify-between px-4 sm:px-56 text-center">
-          <div className="flex sm:flex-col gap-10 items-center">
-            <img src="/lovable-uploads/33265cf6-499d-4191-a3ba-8586455ad12e.png" alt="logo" className="sm:w-56 sm:h-40 w-28 h-16 object-cover" />
-            <img src={certification} alt="certificado" className="sm:w-52 sm:h-12 w-44 h-10 object-cover" />
-          </div>
-          <div>
-            <h2 className="text-3xl font-bold mb-8">Entre em Contato</h2>
-            <div className="max-w-lg mx-auto">
-              <input
-                type="text"
-                name="name"
-                placeholder="Seu Nome"
-                value={formData.name}
-                onChange={handleInputChange}
-                className="w-full p-3 mb-4 border border-gray-300 rounded"
-              />
-              <input
-                type="email"
-                name="email"
-                placeholder="Seu E-mail"
-                value={formData.email}
-                onChange={handleInputChange}
-                className="w-full p-3 mb-4 border border-gray-300 rounded"
-              />
-              <input
-                type="tel"
-                name="phone"
-                placeholder="Seu Telefone"
-                value={formData.phone}
-                onChange={handleInputChange}
-                className="w-full p-3 mb-4 border border-gray-300 rounded"
-              />
-              <button
-                onClick={handleSubmit}
-                className="w-full bg-black text-white py-3 rounded-lg font-semibold hover:bg-gray-800"
-              >
-                Enviar
-              </button>
+              <Building className="w-12 h-12 mx-auto mb-4 text-purple-400" />
+              <div className="text-4xl font-bold text-white mb-2">+20</div>
+              <div className="text-lg text-gray-300 font-semibold">Projetos em Andamento</div>
             </div>
           </div>
         </div>
