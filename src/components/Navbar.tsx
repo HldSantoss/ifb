@@ -12,7 +12,7 @@ const Navbar = () => {
     { name: 'Início', path: '/' },
     { name: 'Sobre Nós', path: '/about' },
     { name: 'Fale Conosco', path: '/contact' },
-    { name: 'Área do Cliente', path: '/client-area' },
+    { name: '2° Via Boleto', path: '/client-area' },
   ];
 
   const isActive = (path: string) => location.pathname === path;
