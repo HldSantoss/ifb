@@ -119,7 +119,7 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Hero Section with Banner */}
-      <section className="relative h-screen bg-white overflow-hidden">
+      <section className="relative h-screen bg-white overflow-hidden -mt-20">
         <img 
           src="/lovable-uploads/fb4fe2ed-59f1-4b9e-a1e4-96a07f899514.png" 
           alt="Banner IFB Incorporadora" 
@@ -128,7 +128,7 @@ const Index = () => {
       </section>
 
       {/* Properties Section with Carousel */}
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-white mb-8">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold mb-6">
@@ -251,26 +251,39 @@ const Index = () => {
       {/* Stats Section */}
       <section className="py-20 bg-black">
         <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
+              Excelência Comprovada
+            </h2>
+            <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+              Mais de duas décadas construindo sonhos e transformando vidas através da arquitetura de qualidade.
+            </p>
+          </div>
+          
           <div className="grid md:grid-cols-4 gap-8 text-center">
-            <div className="p-8">
-              <Award className="w-12 h-12 mx-auto mb-4 text-white" />
+            <div className="p-8 bg-gray-900 rounded-xl hover:bg-gray-800 transition-colors duration-300">
+              <Award className="w-12 h-12 mx-auto mb-4 text-yellow-400" />
               <div className="text-4xl font-bold text-white mb-2">25+</div>
               <div className="text-lg text-gray-300">Anos de Experiência</div>
+              <p className="text-sm text-gray-400 mt-2">Tradição e inovação</p>
             </div>
-            <div className="p-8">
-              <Building className="w-12 h-12 mx-auto mb-4 text-white" />
+            <div className="p-8 bg-gray-900 rounded-xl hover:bg-gray-800 transition-colors duration-300">
+              <Building className="w-12 h-12 mx-auto mb-4 text-blue-400" />
               <div className="text-4xl font-bold text-white mb-2">150+</div>
               <div className="text-lg text-gray-300">Empreendimentos Entregues</div>
+              <p className="text-sm text-gray-400 mt-2">Qualidade garantida</p>
             </div>
-            <div className="p-8">
-              <Users className="w-12 h-12 mx-auto mb-4 text-white" />
+            <div className="p-8 bg-gray-900 rounded-xl hover:bg-gray-800 transition-colors duration-300">
+              <Users className="w-12 h-12 mx-auto mb-4 text-green-400" />
               <div className="text-4xl font-bold text-white mb-2">5000+</div>
               <div className="text-lg text-gray-300">Famílias Atendidas</div>
+              <p className="text-sm text-gray-400 mt-2">Sonhos realizados</p>
             </div>
-            <div className="p-8">
-              <Building className="w-12 h-12 mx-auto mb-4 text-white" />
+            <div className="p-8 bg-gray-900 rounded-xl hover:bg-gray-800 transition-colors duration-300">
+              <Building className="w-12 h-12 mx-auto mb-4 text-purple-400" />
               <div className="text-4xl font-bold text-white mb-2">+20</div>
               <div className="text-lg text-gray-300">Projetos em Andamento</div>
+              <p className="text-sm text-gray-400 mt-2">Futuro em construção</p>
             </div>
           </div>
         </div>
