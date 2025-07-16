@@ -119,16 +119,26 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Hero Section with Banner */}
-      <section className="relative h-screen bg-white overflow-hidden -mt-20">
+      <section className="relative h-screen bg-white overflow-hidden">
         <img 
           src="/lovable-uploads/fb4fe2ed-59f1-4b9e-a1e4-96a07f899514.png" 
           alt="Banner IFB Incorporadora" 
-          className="w-full h-full object-contain"
+          className="w-full h-full object-cover"
         />
+        <div className="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center">
+          <div className="text-center text-white">
+            <h1 className="text-5xl md:text-7xl font-bold mb-4">
+              1 e 2 Dormitórios
+            </h1>
+            <p className="text-xl md:text-2xl">
+              Apartamentos pensados para o seu conforto
+            </p>
+          </div>
+        </div>
       </section>
 
       {/* Properties Section with Carousel */}
-      <section className="py-20 bg-white mb-8">
+      <section className="py-20 bg-white pb-32">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold mb-6">
@@ -249,41 +259,44 @@ const Index = () => {
       </section>
 
       {/* Stats Section */}
-      <section className="py-20 bg-black">
+      <section className="py-20" style={{ background: 'linear-gradient(135deg, #C3EAF7 0%, #E6F7FF 100%)' }}>
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-              Excelência Comprovada
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+              More than 25 Years of Excellence
             </h2>
-            <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-              Mais de duas décadas construindo sonhos e transformando vidas através da arquitetura de qualidade.
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-4">
+              Transformando sonhos em realidade há mais de duas décadas
+            </p>
+            <p className="text-lg text-gray-500 max-w-2xl mx-auto">
+              Construindo o futuro com qualidade, inovação e compromisso com cada família.
             </p>
           </div>
           
           <div className="grid md:grid-cols-4 gap-8 text-center">
-            <div className="p-8 bg-gray-900 rounded-xl hover:bg-gray-800 transition-colors duration-300">
-              <Award className="w-12 h-12 mx-auto mb-4 text-yellow-400" />
-              <div className="text-4xl font-bold text-white mb-2">25+</div>
-              <div className="text-lg text-gray-300">Anos de Experiência</div>
-              <p className="text-sm text-gray-400 mt-2">Tradição e inovação</p>
+            <div className="p-8 bg-white/80 backdrop-blur rounded-xl hover:bg-white/90 transition-all duration-300 border border-blue-100 shadow-lg">
+              <Award className="w-12 h-12 mx-auto mb-4 text-yellow-500" />
+              <div className="text-4xl font-bold text-gray-900 mb-2">25+</div>
+              <div className="text-lg text-gray-700 font-semibold">Anos de Experiência</div>
+              <p className="text-sm text-gray-600 mt-2">Tradição e inovação</p>
             </div>
-            <div className="p-8 bg-gray-900 rounded-xl hover:bg-gray-800 transition-colors duration-300">
-              <Building className="w-12 h-12 mx-auto mb-4 text-blue-400" />
-              <div className="text-4xl font-bold text-white mb-2">150+</div>
-              <div className="text-lg text-gray-300">Empreendimentos Entregues</div>
-              <p className="text-sm text-gray-400 mt-2">Qualidade garantida</p>
+            <div className="p-8 bg-white/80 backdrop-blur rounded-xl hover:bg-white/90 transition-all duration-300 border border-blue-100 shadow-lg">
+              <Building className="w-12 h-12 mx-auto mb-4 text-blue-500" />
+              <div className="text-4xl font-bold text-gray-900 mb-2">150+</div>
+              <div className="text-lg text-gray-700 font-semibold">Empreendimentos Entregues</div>
+              <p className="text-sm text-gray-600 mt-2">Qualidade garantida</p>
             </div>
-            <div className="p-8 bg-gray-900 rounded-xl hover:bg-gray-800 transition-colors duration-300">
-              <Users className="w-12 h-12 mx-auto mb-4 text-green-400" />
-              <div className="text-4xl font-bold text-white mb-2">5000+</div>
-              <div className="text-lg text-gray-300">Famílias Atendidas</div>
-              <p className="text-sm text-gray-400 mt-2">Sonhos realizados</p>
+            <div className="p-8 bg-white/80 backdrop-blur rounded-xl hover:bg-white/90 transition-all duration-300 border border-blue-100 shadow-lg">
+              <Users className="w-12 h-12 mx-auto mb-4 text-green-500" />
+              <div className="text-4xl font-bold text-gray-900 mb-2">5000+</div>
+              <div className="text-lg text-gray-700 font-semibold">Famílias Atendidas</div>
+              <p className="text-sm text-gray-600 mt-2">Sonhos realizados</p>
             </div>
-            <div className="p-8 bg-gray-900 rounded-xl hover:bg-gray-800 transition-colors duration-300">
-              <Building className="w-12 h-12 mx-auto mb-4 text-purple-400" />
-              <div className="text-4xl font-bold text-white mb-2">+20</div>
-              <div className="text-lg text-gray-300">Projetos em Andamento</div>
-              <p className="text-sm text-gray-400 mt-2">Futuro em construção</p>
+            <div className="p-8 bg-white/80 backdrop-blur rounded-xl hover:bg-white/90 transition-all duration-300 border border-blue-100 shadow-lg">
+              <Building className="w-12 h-12 mx-auto mb-4 text-purple-500" />
+              <div className="text-4xl font-bold text-gray-900 mb-2">+20</div>
+              <div className="text-lg text-gray-700 font-semibold">Projetos em Andamento</div>
+              <p className="text-sm text-gray-600 mt-2">Futuro em construção</p>
             </div>
           </div>
         </div>
