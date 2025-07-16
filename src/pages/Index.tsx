@@ -125,16 +125,6 @@ const Index = () => {
           alt="Banner IFB Incorporadora" 
           className="w-full h-full object-cover"
         />
-        <div className="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center">
-          <div className="text-center text-white">
-            <h1 className="text-5xl md:text-7xl font-bold mb-4">
-              1 e 2 Dormitórios
-            </h1>
-            <p className="text-xl md:text-2xl">
-              Apartamentos pensados para o seu conforto
-            </p>
-          </div>
-        </div>
       </section>
 
       {/* Properties Section with Carousel */}
@@ -165,12 +155,12 @@ const Index = () => {
                     return (
                       <div key={property.id} className="flex-[0_0_100%] md:flex-[0_0_50%] lg:flex-[0_0_33.33%] xl:flex-[0_0_25%] min-w-0 px-4">
                         <div className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
-                          <div className="relative">
-                            <img 
-                              src={property.image} 
-                              alt={property.title}
-                              className="w-full h-48 object-cover"
-                            />
+                           <div className="relative">
+                             <img 
+                               src={property.image} 
+                               alt={property.title}
+                               className="w-full h-64 object-cover"
+                             />
                           </div>
                           <div className="p-6">
                             <span className="text-white text-sm mb-4 bg-black transition-transform duration-300 p-2 rounded inline-block hover:bg-gray-800">
@@ -211,7 +201,7 @@ const Index = () => {
             </div>
           )}
           
-          <div className="text-center mt-12">
+          <div className="text-center mt-16 mb-8">
             <Button asChild size="lg" className="bg-black hover:bg-gray-800">
               <Link to="/contact">
                 Ver Todos os Empreendimentos
@@ -261,9 +251,9 @@ const Index = () => {
       {/* Stats Section */}
       <section className="py-20" style={{ background: 'linear-gradient(135deg, #C3EAF7 0%, #E6F7FF 100%)' }}>
         <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
+          <div className="text-center mb-16 animate-fade-in">
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-              More than 25 Years of Excellence
+              25 Anos de Experiência
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-4">
               Transformando sonhos em realidade há mais de duas décadas
@@ -274,25 +264,25 @@ const Index = () => {
           </div>
           
           <div className="grid md:grid-cols-4 gap-8 text-center">
-            <div className="p-8 bg-white/80 backdrop-blur rounded-xl hover:bg-white/90 transition-all duration-300 border border-blue-100 shadow-lg">
+            <div className="p-8 bg-white/80 backdrop-blur rounded-xl hover:bg-white/90 transition-all duration-300 border border-blue-100 shadow-lg hover-scale animate-fade-in">
               <Award className="w-12 h-12 mx-auto mb-4 text-yellow-500" />
               <div className="text-4xl font-bold text-gray-900 mb-2">25+</div>
               <div className="text-lg text-gray-700 font-semibold">Anos de Experiência</div>
               <p className="text-sm text-gray-600 mt-2">Tradição e inovação</p>
             </div>
-            <div className="p-8 bg-white/80 backdrop-blur rounded-xl hover:bg-white/90 transition-all duration-300 border border-blue-100 shadow-lg">
+            <div className="p-8 bg-white/80 backdrop-blur rounded-xl hover:bg-white/90 transition-all duration-300 border border-blue-100 shadow-lg hover-scale animate-fade-in" style={{ animationDelay: '0.1s' }}>
               <Building className="w-12 h-12 mx-auto mb-4 text-blue-500" />
               <div className="text-4xl font-bold text-gray-900 mb-2">150+</div>
               <div className="text-lg text-gray-700 font-semibold">Empreendimentos Entregues</div>
               <p className="text-sm text-gray-600 mt-2">Qualidade garantida</p>
             </div>
-            <div className="p-8 bg-white/80 backdrop-blur rounded-xl hover:bg-white/90 transition-all duration-300 border border-blue-100 shadow-lg">
+            <div className="p-8 bg-white/80 backdrop-blur rounded-xl hover:bg-white/90 transition-all duration-300 border border-blue-100 shadow-lg hover-scale animate-fade-in" style={{ animationDelay: '0.2s' }}>
               <Users className="w-12 h-12 mx-auto mb-4 text-green-500" />
               <div className="text-4xl font-bold text-gray-900 mb-2">5000+</div>
               <div className="text-lg text-gray-700 font-semibold">Famílias Atendidas</div>
               <p className="text-sm text-gray-600 mt-2">Sonhos realizados</p>
             </div>
-            <div className="p-8 bg-white/80 backdrop-blur rounded-xl hover:bg-white/90 transition-all duration-300 border border-blue-100 shadow-lg">
+            <div className="p-8 bg-white/80 backdrop-blur rounded-xl hover:bg-white/90 transition-all duration-300 border border-blue-100 shadow-lg hover-scale animate-fade-in" style={{ animationDelay: '0.3s' }}>
               <Building className="w-12 h-12 mx-auto mb-4 text-purple-500" />
               <div className="text-4xl font-bold text-gray-900 mb-2">+20</div>
               <div className="text-lg text-gray-700 font-semibold">Projetos em Andamento</div>
