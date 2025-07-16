@@ -119,7 +119,7 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Hero Section with Banner */}
-      <section className="relative h-screen bg-white overflow-hidden">
+      <section className="relative w-full h-screen overflow-hidden">
         <img 
           src="/lovable-uploads/fb4fe2ed-59f1-4b9e-a1e4-96a07f899514.png" 
           alt="Banner IFB Incorporadora" 
@@ -249,44 +249,34 @@ const Index = () => {
       </section>
 
       {/* Stats Section */}
-      <section className="py-20" style={{ background: 'linear-gradient(135deg, #C3EAF7 0%, #E6F7FF 100%)' }}>
+      <section className="py-20 bg-white">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-16 animate-fade-in">
+          <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
               25 Anos de Experiência
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-4">
-              Transformando sonhos em realidade há mais de duas décadas
-            </p>
-            <p className="text-lg text-gray-500 max-w-2xl mx-auto">
-              Construindo o futuro com qualidade, inovação e compromisso com cada família.
-            </p>
           </div>
           
           <div className="grid md:grid-cols-4 gap-8 text-center">
-            <div className="p-8 bg-white/80 backdrop-blur rounded-xl hover:bg-white/90 transition-all duration-300 border border-blue-100 shadow-lg hover-scale animate-fade-in">
+            <div className="p-8">
               <Award className="w-12 h-12 mx-auto mb-4 text-yellow-500" />
               <div className="text-4xl font-bold text-gray-900 mb-2">25+</div>
               <div className="text-lg text-gray-700 font-semibold">Anos de Experiência</div>
-              <p className="text-sm text-gray-600 mt-2">Tradição e inovação</p>
             </div>
-            <div className="p-8 bg-white/80 backdrop-blur rounded-xl hover:bg-white/90 transition-all duration-300 border border-blue-100 shadow-lg hover-scale animate-fade-in" style={{ animationDelay: '0.1s' }}>
+            <div className="p-8">
               <Building className="w-12 h-12 mx-auto mb-4 text-blue-500" />
               <div className="text-4xl font-bold text-gray-900 mb-2">150+</div>
               <div className="text-lg text-gray-700 font-semibold">Empreendimentos Entregues</div>
-              <p className="text-sm text-gray-600 mt-2">Qualidade garantida</p>
             </div>
-            <div className="p-8 bg-white/80 backdrop-blur rounded-xl hover:bg-white/90 transition-all duration-300 border border-blue-100 shadow-lg hover-scale animate-fade-in" style={{ animationDelay: '0.2s' }}>
+            <div className="p-8">
               <Users className="w-12 h-12 mx-auto mb-4 text-green-500" />
               <div className="text-4xl font-bold text-gray-900 mb-2">5000+</div>
               <div className="text-lg text-gray-700 font-semibold">Famílias Atendidas</div>
-              <p className="text-sm text-gray-600 mt-2">Sonhos realizados</p>
             </div>
-            <div className="p-8 bg-white/80 backdrop-blur rounded-xl hover:bg-white/90 transition-all duration-300 border border-blue-100 shadow-lg hover-scale animate-fade-in" style={{ animationDelay: '0.3s' }}>
+            <div className="p-8">
               <Building className="w-12 h-12 mx-auto mb-4 text-purple-500" />
               <div className="text-4xl font-bold text-gray-900 mb-2">+20</div>
               <div className="text-lg text-gray-700 font-semibold">Projetos em Andamento</div>
-              <p className="text-sm text-gray-600 mt-2">Futuro em construção</p>
             </div>
           </div>
         </div>
